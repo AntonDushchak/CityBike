@@ -2,7 +2,6 @@
 BikeShareSystem: analysis methods
 """
 
-
 class BikeShareSystem:
     """Main analysis system for bike sharing data"""
     
