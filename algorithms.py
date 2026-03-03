@@ -38,8 +38,9 @@ def my_search(arr, target, key):
 
 
 def pandas_search(arr, target, key):
-    """Pandas search implementation. E.g. boolean indexing"""
+    """Pandas search using .loc[] with key support."""
     
     df = pd.DataFrame(arr)
-    result = df[df.apply(lambda x: key(x) == key(target), axis=1)]
-    return result.index[0] if not result.empty else -1
+    mask = df.apply(lambda x: key(x) == key(target), axis=1)
+    idx = df.loc[mask].index
+    return idx[0] if len(idx) > 0 else -1
