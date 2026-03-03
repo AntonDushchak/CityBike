@@ -12,11 +12,9 @@ def my_sort(arr, key):
     right = [x for x in arr[1:] if key(x) >= key(pivot)]
     return my_sort(left, key) + [pivot] + my_sort(right, key)
 
-
 def python_sort(arr, key):
     """Python built-in sort with key support"""
     return sorted(arr, key=key)
-
 
 def my_search(arr, target, key):
     """My search implementation. E.g. binary search with key support"""
@@ -36,10 +34,9 @@ def my_search(arr, target, key):
 
     return -1
 
-
 def pandas_search(arr, target, key):
     """Pandas search using .loc[] with key support."""
-    
+
     df = pd.DataFrame(arr)
     mask = df.apply(lambda x: key(x) == key(target), axis=1)
     idx = df.loc[mask].index
