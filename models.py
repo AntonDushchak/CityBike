@@ -1,7 +1,7 @@
 """
 OOP classes (Entity, Bike, Station, ...)
 """
-from abc import ABC
+from abc import ABC, abstractmethod
 from datetime import datetime
 
 BIKE_STATUSES = ("available", "in_use", "maintenance")
@@ -23,9 +23,11 @@ class Entity(ABC):
     def created_at(self):
         return self._created_at
 
+    @abstractmethod
     def __str__(self):
         return f"{self.__class__.__name__}(id={self.id}, created_at={self.created_at})"
     
+    @abstractmethod
     def __repr__(self):
         return self.__str__()
 
@@ -251,3 +253,9 @@ class MaintenanceRecord:
         if value < 0:
             raise ValueError("Cost must be non-negative")
         self._cost = value
+
+    def __str__(self):
+        return f"MaintenanceRecord(id={self.id}, bike_id={self.bike.id}, date={self.date}, type={self.maintenance_type}, cost={self.cost})"
+    
+    def __repr__(self):
+        return self.__str__()

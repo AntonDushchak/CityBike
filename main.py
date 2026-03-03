@@ -1,7 +1,7 @@
 from loader import load_csv, save_csv
 from analyzer import BikeShareSystem
 from utils import clean_data_stations, clean_data_trips, clean_data_maintenance
-from mapper import dataframe_to_stations, dataframe_to_trips, dataframe_to_maintenance_records, dataframe_to_bikes
+from mapper import dataframe_to_stations, dataframe_to_trips, dataframe_to_maintenance_records, dataframe_to_bikes, dataframe_to_users
 
 stations_path = "data/stations.csv"
 trips_path = "data/trips.csv"
@@ -24,13 +24,16 @@ def main():
     save_csv(trips_clean_path, trips_cleaned)
     save_csv(maintenance_clean_path, maintenance_cleaned)
 
-    stations = dataframe_to_stations(stations_cleaned)
-    trips = dataframe_to_trips(trips_cleaned)
-    maintenance = dataframe_to_maintenance_records(maintenance_cleaned)
-    users = dataframe_to_users(trips_cleaned)
-
     bikes = dataframe_to_bikes(trips_cleaned, active=True)
     bikes.extend(dataframe_to_bikes(maintenance_cleaned, active=False))
+    users = dataframe_to_users(trips_cleaned)
+
+    stations = dataframe_to_stations(stations_cleaned)
+    trips = dataframe_to_trips(trips_cleaned, users, bikes, stations)
+    maintenance = dataframe_to_maintenance_records(maintenance_cleaned, bikes)
+    
+
+    
 
     system = BikeShareSystem(
         bikes=bikes, 

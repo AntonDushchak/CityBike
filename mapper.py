@@ -34,38 +34,51 @@ def dataframe_to_stations(df):
         stations.append(station)
     return stations
 
-def dataframe_to_maintenance_records(df):
+def dataframe_to_maintenance_records(df, bikes):
     """Convert a DataFrame of maintenance data into a list of MaintenanceRecord objects"""
+    bikes_dict = {bike.id: bike for bike in bikes}
     records = []
     for _, row in df.iterrows():
+        bike = bikes_dict.get(row["bike_id"])
+        if bike is None:
+            continue
         record = models.MaintenanceRecord(
-            id=row["record_id"], 
-            bike_id=row["bike_id"], 
-            bike_type=row["bike_type"], 
-            date=row["date"], 
-            maintenance_type=row["maintenance_type"], 
-            cost=row["cost"], 
-            description=row["description"])
+            id=row["record_id"],
+            bike=bike,
+            date=row["date"],
+            maintenance_type=row["maintenance_type"],
+            cost=row["cost"],
+            description=row["description"]
+        )
         records.append(record)
     return records
 
-def dataframe_to_trips(df):
+def dataframe_to_trips(df, users, bikes, stations):
     """Convert a DataFrame of trip data into a list of Trip objects"""
+    users_dict = {user.id: user for user in users}
+    bikes_dict = {bike.id: bike for bike in bikes}
+    stations_dict = {station.id: station for station in stations}
+    
     trips = []
     for _, row in df.iterrows():
+        user = users_dict.get(row["user_id"])
+        bike = bikes_dict.get(row["bike_id"])
+        start_station = stations_dict.get(row["start_station_id"])
+        end_station = stations_dict.get(row["end_station_id"])
+        
+        if None in (user, bike, start_station, end_station):
+            continue
+            
         trip = models.Trip(
-            id=row["trip_id"], 
-            user_id=row["user_id"], 
-            bike_id=row["bike_id"], 
-            bike_type=row["bike_type"], 
-            start_time=row["start_time"], 
-            end_time=row["end_time"], 
-            start_station_id=row["start_station_id"], 
-            end_station_id=row["end_station_id"], 
-            duration_minutes=row["duration_minutes"], 
-            distance_km=row["distance_km"], 
-            user_type=row["user_type"], 
-            status=row["status"])
+            id=row["trip_id"],
+            user=user,
+            bike=bike,
+            start_station=start_station,
+            end_station=end_station,
+            start_time=row["start_time"],
+            end_time=row["end_time"],
+            distance_km=row["distance_km"]
+        )
         trips.append(trip)
     return trips
 
