@@ -5,8 +5,11 @@ BikeShareSystem: analysis methods
 class BikeShareSystem:
     """Main analysis system for bike sharing data"""
     
-    def __init__(self):
-        pass
+    def __init__(self, bikes=None, stations=None, trips=None, maintenance_records=None):
+        self.bikes = bikes if bikes is not None else []
+        self.stations = stations if stations is not None else []
+        self.trips = trips if trips is not None else []
+        self.maintenance_records = maintenance_records if maintenance_records is not None else []
     
     def analyze_trips(self):
         """Analyze trip patterns"""

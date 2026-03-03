@@ -26,10 +26,18 @@ def main():
 
     stations = dataframe_to_stations(stations_cleaned)
     trips = dataframe_to_trips(trips_cleaned)
-    maintenance = dataframe_to_maintenance(maintenance_cleaned)
+    maintenance = dataframe_to_maintenance_records(maintenance_cleaned)
 
-    system = BikeShareSystem()
+    bikes = dataframe_to_bikes(trips_cleaned, active=True)
+    bikes.extend(dataframe_to_bikes(maintenance_cleaned, active=False))
 
+    system = BikeShareSystem(
+        bikes=bikes, 
+        stations=stations, 
+        trips=trips, 
+        maintenance_records=maintenance)
+
+    
     print("Pipeline completed successfully.")
 
 if __name__ == "__main__":
