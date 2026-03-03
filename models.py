@@ -200,7 +200,7 @@ class User(Entity):
 
 class CasualUser(User):
     """Casual user model class"""
-    def __init__(self, id, name, email, day_pass_count):
+    def __init__(self, id, name, email, day_pass_count = 0):
         super().__init__(id, name, email, "casual")
         self.day_pass_count = day_pass_count
 
@@ -228,8 +228,8 @@ class MemberUser(User):
 
     @tier.setter
     def tier(self, value):
-        if value not in ("standard", "premium"):
-            raise ValueError("Tier must be 'standard' or 'premium'")
+        if value not in MEMBER_TIERS:
+            raise ValueError(f"Tier must be one of {MEMBER_TIERS}")
         self._tier = value
 
 class MaintenanceRecord:

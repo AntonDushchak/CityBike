@@ -68,3 +68,33 @@ def dataframe_to_trips(df):
             status=row["status"])
         trips.append(trip)
     return trips
+
+def dataframe_to_users(df):
+    """Convert a DataFrame of trip data into a list of User objects"""
+    users = {}
+    casual_factory = factories.CasualUserFactory()
+    member_factory = factories.MemberUserFactory()
+    for _, row in df.iterrows():
+        user_id = row["user_id"]
+        if user_id not in users:
+            if row["user_type"] == "casual":
+                user = casual_factory.create_user(
+                    id=user_id,
+                    name=f"User {user_id}",
+                    email=f"user{user_id}@example.com"
+                )
+            elif row["user_type"] == "member":
+                user = member_factory.create_user(
+                    id=user_id,
+                    name=f"User {user_id}",
+                    email=f"user{user_id}@example.com",
+                    tier=row.get("tier", "standard")
+                )
+            else:
+                continue
+            users[user_id] = user
+        else:
+            user = users[user_id]
+            if row["user_type"] == "casual" and isinstance(user, models.CasualUser):
+                user.day_pass_count += 1
+    return list(users.values())

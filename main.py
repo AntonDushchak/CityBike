@@ -27,6 +27,7 @@ def main():
     stations = dataframe_to_stations(stations_cleaned)
     trips = dataframe_to_trips(trips_cleaned)
     maintenance = dataframe_to_maintenance_records(maintenance_cleaned)
+    users = dataframe_to_users(trips_cleaned)
 
     bikes = dataframe_to_bikes(trips_cleaned, active=True)
     bikes.extend(dataframe_to_bikes(maintenance_cleaned, active=False))
@@ -35,9 +36,10 @@ def main():
         bikes=bikes, 
         stations=stations, 
         trips=trips, 
-        maintenance_records=maintenance)
+        maintenance_records=maintenance,
+        users=users)
 
-    
+
     print("Pipeline completed successfully.")
 
 if __name__ == "__main__":
