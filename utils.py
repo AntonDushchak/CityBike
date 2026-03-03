@@ -11,6 +11,7 @@ def validate_data_trips(trip):
     mask = trip[required].notnull().all(axis=1)
     mask &= trip["duration_minutes"].apply(lambda x: isinstance(x, (int, float)) and x >= 0)
     mask &= trip["distance_km"].apply(lambda x: isinstance(x, (int, float)) and x >= 0)
+    mask &= trip["end_time"] >= trip["start_time"]
     return mask
 
 def validate_data_stations(station):
