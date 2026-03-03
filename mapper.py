@@ -1,7 +1,7 @@
 import models
 import factories
 
-def dataframe_to_bikes(df, status):
+def dataframe_to_bikes(df, active=True):
     """Convert a DataFrame of bike data into a list of Bike objects"""
     bikes = []
     classic_factory = factories.ClassicBikeFactory()
@@ -13,7 +13,11 @@ def dataframe_to_bikes(df, status):
             bike = electric_factory.create_bike(row["bike_id"])
         else:
             continue
-        bike.status = status
+        
+        if active:
+            bike.status = "active" if row["status"] == "available" else "in_use"
+        else:
+            bike.status = "maintenance"
         bikes.append(bike)
     return bikes
 
@@ -44,3 +48,23 @@ def dataframe_to_maintenance_records(df):
             description=row["description"])
         records.append(record)
     return records
+
+def dataframe_to_trips(df):
+    """Convert a DataFrame of trip data into a list of Trip objects"""
+    trips = []
+    for _, row in df.iterrows():
+        trip = models.Trip(
+            id=row["trip_id"], 
+            user_id=row["user_id"], 
+            bike_id=row["bike_id"], 
+            bike_type=row["bike_type"], 
+            start_time=row["start_time"], 
+            end_time=row["end_time"], 
+            start_station_id=row["start_station_id"], 
+            end_station_id=row["end_station_id"], 
+            duration_minutes=row["duration_minutes"], 
+            distance_km=row["distance_km"], 
+            user_type=row["user_type"], 
+            status=row["status"])
+        trips.append(trip)
+    return trips
