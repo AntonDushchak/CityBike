@@ -8,6 +8,7 @@ import pandas as pd
 
 from analytics_reporter import AnalyticsReporter
 from algorithms import my_sort, python_sort, my_search, pandas_search
+from loader import save_csv
 from visualization import (
     plot_trips_per_station,
     plot_monthly_trip_trend,
@@ -101,27 +102,27 @@ class BikeShareSystem:
         if combined_frames:
             stations_df = pd.concat(combined_frames, ignore_index=True)
             station_path = out_dir / "top_stations.csv"
-            stations_df.to_csv(station_path, index=False)
+            save_csv(str(station_path), stations_df)
             exports["top_stations"] = str(station_path)
 
         # Top users
         top_users = metrics.get("top_users")
         if isinstance(top_users, pd.DataFrame) and not top_users.empty:
             users_path = out_dir / "top_users.csv"
-            top_users.to_csv(users_path, index=False)
+            save_csv(str(users_path), top_users)
             exports["top_users"] = str(users_path)
 
         # Maintenance summaries (cost + frequency)
         maintenance_cost = metrics.get("maintenance_cost")
         if isinstance(maintenance_cost, pd.DataFrame) and not maintenance_cost.empty:
             cost_path = out_dir / "maintenance_costs.csv"
-            maintenance_cost.to_csv(cost_path, index=False)
+            save_csv(str(cost_path), maintenance_cost)
             exports["maintenance_costs"] = str(cost_path)
 
         maintenance_frequency = metrics.get("maintenance_frequency")
         if isinstance(maintenance_frequency, pd.DataFrame) and not maintenance_frequency.empty:
             freq_path = out_dir / "maintenance_frequency.csv"
-            maintenance_frequency.to_csv(freq_path, index=False)
+            save_csv(str(freq_path), maintenance_frequency)
             exports["maintenance_frequency"] = str(freq_path)
 
         return exports

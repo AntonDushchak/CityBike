@@ -6,6 +6,8 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 
+from loader import save_txt
+
 REPORT_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M UTC"
 TOP_STATION_LIMIT = 10
 TOP_ROUTE_LIMIT = 10
@@ -144,10 +146,8 @@ class AnalyticsReporter:
 
     @staticmethod
     def save_report(report_text: str, report_path: str) -> str:
-        path = Path(report_path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(report_text, encoding="utf-8")
-        return str(path)
+        save_txt(report_path, report_text)
+        return str(Path(report_path))
 
     @staticmethod
     def _format_table(df: Optional[pd.DataFrame], columns: Optional[List[str]] = None, max_rows: int = 10) -> str:
@@ -164,14 +164,12 @@ class AnalyticsReporter:
     def _trip_summary(self) -> Dict[str, float]:
         if self.trips.empty:
             return {"total_trips": 0, "total_distance_km": 0.0, "avg_duration_minutes": 0.0}
-        return (
-            self.maintenance["bike_id"]
-            .value_counts()
-            .reset_index()
-            .rename(columns={"index": "bike_id", "bike_id": "maintenance_events"})
-            .head(MAINTENANCE_TOP_LIMIT)
-        )
-            "avg_duration_minutes": float(self.trips["duration_minutes"].mean()),
+        distance = float(self.trips["distance_km"].sum()) if "distance_km" in self.trips else 0.0
+        avg_duration = float(self.trips["duration_minutes"].mean()) if "duration_minutes" in self.trips else 0.0
+        return {
+            "total_trips": int(len(self.trips)),
+            "total_distance_km": distance,
+            "avg_duration_minutes": avg_duration,
         }
 
     def _top_stations(self) -> Dict[str, pd.DataFrame]:
@@ -298,7 +296,13 @@ class AnalyticsReporter:
     def _maintenance_frequency(self) -> pd.DataFrame:
         if self.maintenance.empty or "bike_id" not in self.maintenance:
             return pd.DataFrame(columns=["bike_id", "maintenance_events"])
-        return self.maintenance["bike_id"].value_counts().reset_index().rename(columns={"index": "bike_id", "bike_id": "maintenance_events"}).head(10)
+        return (
+            self.maintenance["bike_id"]
+            .value_counts()
+            .reset_index()
+            .rename(columns={"index": "bike_id", "bike_id": "maintenance_events"})
+            .head(MAINTENANCE_TOP_LIMIT)
+        )
 
     def _trip_outliers(self) -> pd.DataFrame:
         required = {"trip_id", "duration_minutes", "distance_km"}
