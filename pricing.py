@@ -34,8 +34,8 @@ class CasualPricing(PricingStrategy):
         return 1.0 * distance_km
 
 
-class PremiumPricing(PricingStrategy):
-    """Discounted pricing strategy for premium members."""
+class MemberPricing(PricingStrategy):
+    """Discounted pricing strategy for member users."""
 
     def calculate_price(self, distance_km: float) -> float:
         """Calculate price at $0.80 per km (20% discount).

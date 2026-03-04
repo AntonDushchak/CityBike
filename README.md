@@ -50,6 +50,33 @@ CityBike/
 - `output/*.csv` – Tables for top stations, top users, and maintenance KPIs.
 - `output/figures/*.png` – Required Matplotlib visualizations plus the algorithm benchmark chart.
 
+## Testing
+
+The project includes a comprehensive test suite using pytest.
+
+### Test Structure
+
+```
+tests/
+├── __init__.py
+├── test_models.py       # Tests for OOP models (Bike, Station, User, Trip, etc.)
+└── test_algorithms.py   # Tests for sorting & searching algorithms
+```
+
+### Running Tests
+
+```powershell
+python -m pytest tests/ -v
+```
+
+### Test Coverage
+
+- **54 total tests** covering:
+  - Model validation (valid inputs and edge cases)
+  - Custom merge sort algorithm
+  - Binary search implementation
+  - Comparison with built-in Python/pandas functions
+
 ## Customization Tips
 
 - Replace the CSVs in `data/` with your own bike-share datasets (keep column names consistent with `utils.py`).
