@@ -27,13 +27,15 @@ def main():
     save_csv(maintenance_clean_path, maintenance_cleaned)
 
     system = BikeShareSystem(
-        users_cleaned, 
-        bikes_cleaned, 
-        stations_cleaned, 
-        trips_cleaned, 
-        maintenance_cleaned)
+        users_cleaned,
+        bikes_cleaned,
+        stations_cleaned,
+        trips_cleaned,
+        maintenance_cleaned,
+    )
 
-
+    insights = system.generate_insights()
+    print(f"Summary report saved to {insights['report_path']}")
     
     # bikes = dataframe_to_bikes(trips_cleaned, active=True)
     # bikes.extend(dataframe_to_bikes(maintenance_cleaned, active=False))
