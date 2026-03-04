@@ -15,7 +15,6 @@ from models import (
     MEMBER_TIERS,
 )
 
-
 class BikeFactory(ABC):
     """Abstract factory for creating Bike objects."""
 
@@ -31,7 +30,6 @@ class BikeFactory(ABC):
         """
         pass
 
-
 class ClassicBikeFactory(BikeFactory):
     """Factory for creating ClassicBike objects."""
 
@@ -46,7 +44,6 @@ class ClassicBikeFactory(BikeFactory):
             New ClassicBike instance.
         """
         return ClassicBike(id=id, status="available", gear_count=gear_count)
-
 
 class ElectricBikeFactory(BikeFactory):
     """Factory for creating ElectricBike objects."""
@@ -68,7 +65,6 @@ class ElectricBikeFactory(BikeFactory):
             id=id, status="available", battery_level=battery_level, max_range_km=max_range_km
         )
 
-
 class UserFactory(ABC):
     """Abstract factory for creating User objects."""
 
@@ -86,7 +82,6 @@ class UserFactory(ABC):
         """
         pass
 
-
 class CasualUserFactory(UserFactory):
     """Factory for creating CasualUser objects."""
 
@@ -102,7 +97,6 @@ class CasualUserFactory(UserFactory):
             New CasualUser instance.
         """
         return CasualUser(id=id, name=name, email=email)
-
 
 class MemberUserFactory(UserFactory):
     """Factory for creating MemberUser objects."""

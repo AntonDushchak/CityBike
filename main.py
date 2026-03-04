@@ -6,7 +6,6 @@ STATIONS_PATH: str = "data/stations.csv"
 TRIPS_PATH: str = "data/trips.csv"
 MAINTENANCE_PATH: str = "data/maintenance.csv"
 
-
 def main() -> None:
     """Run the complete CityBike analytics pipeline.
 
@@ -25,7 +24,7 @@ def main() -> None:
     )
 
     results = system.run_pipeline()
-    
+
     clean_exports = results.get("clean_exports", {})
     if clean_exports:
         print("Cleaned data exports:")

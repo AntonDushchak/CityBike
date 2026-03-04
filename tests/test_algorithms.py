@@ -4,7 +4,6 @@ import pytest
 
 from algorithms import my_search, my_sort, pandas_search, python_sort
 
-
 class TestMergeSort:
     """Tests for custom merge sort implementation."""
 
@@ -98,7 +97,6 @@ class TestMergeSort:
         assert result[1]["duration_minutes"] == 30
         assert result[2]["duration_minutes"] == 45
 
-
 class TestBinarySearch:
     """Tests for custom binary search implementation."""
 
@@ -163,7 +161,6 @@ class TestBinarySearch:
         result = my_search(trips, target, key=lambda x: x["trip_id"])
         assert result == 1
 
-
 class TestPandasSearch:
     """Tests for pandas-based search implementation."""
 
@@ -187,7 +184,6 @@ class TestPandasSearch:
         target = {"id": "X", "value": 99}
         result = pandas_search(data, target, key=lambda x: x["id"])
         assert result == -1
-
 
 class TestPythonSort:
     """Tests for Python built-in sort wrapper."""

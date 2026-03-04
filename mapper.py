@@ -7,7 +7,6 @@ import pandas as pd
 import factories
 import models
 
-
 def dataframe_to_bikes(df: pd.DataFrame, active: bool = True) -> List[models.Bike]:
     """Convert a DataFrame of bike data into a list of Bike objects.
 
@@ -36,7 +35,6 @@ def dataframe_to_bikes(df: pd.DataFrame, active: bool = True) -> List[models.Bik
         bikes.append(bike)
     return bikes
 
-
 def dataframe_to_stations(df: pd.DataFrame) -> List[models.Station]:
     """Convert a DataFrame of station data into a list of Station objects.
 
@@ -56,7 +54,6 @@ def dataframe_to_stations(df: pd.DataFrame) -> List[models.Station]:
             longitude=row["longitude"])
         stations.append(station)
     return stations
-
 
 def dataframe_to_maintenance_records(
     df: pd.DataFrame, bikes: List[models.Bike]
@@ -86,7 +83,6 @@ def dataframe_to_maintenance_records(
         )
         records.append(record)
     return records
-
 
 def dataframe_to_trips(
     df: pd.DataFrame,
@@ -131,7 +127,6 @@ def dataframe_to_trips(
         )
         trips.append(trip)
     return trips
-
 
 def dataframe_to_users(df: pd.DataFrame) -> List[models.User]:
     """Convert a DataFrame of trip data into a list of User objects.

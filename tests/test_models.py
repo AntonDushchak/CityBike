@@ -25,7 +25,6 @@ from models import (
     User,
 )
 
-
 class TestBike:
     """Tests for Bike class and subclasses."""
 
@@ -94,7 +93,6 @@ class TestBike:
         assert "BK001" in str(bike)
         assert "classic" in str(bike)
 
-
 class TestStation:
     """Tests for Station class."""
 
@@ -127,7 +125,6 @@ class TestStation:
         """Test that Station rejects longitude outside valid range."""
         with pytest.raises(ValueError, match="Invalid latitude or longitude"):
             Station(id="ST001", name="Test", capacity=10, latitude=48.8, longitude=200)
-
 
 class TestUser:
     """Tests for User class and subclasses."""
@@ -188,7 +185,6 @@ class TestUser:
                 tier="gold",
             )
 
-
 class TestTrip:
     """Tests for Trip class."""
 
@@ -235,7 +231,6 @@ class TestTrip:
                 end_time=datetime.now(),
                 distance_km=-5.0,
             )
-
 
 class TestMaintenanceRecord:
     """Tests for MaintenanceRecord class."""

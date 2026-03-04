@@ -4,7 +4,6 @@ import datetime
 import random
 from typing import Tuple
 
-
 def generate_fake_start_and_end_date() -> Tuple[datetime.datetime, datetime.datetime]:
     """Generate random start and end dates for membership or trips.
 
