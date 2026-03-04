@@ -101,6 +101,12 @@ class Bike(Entity):
             raise ValueError(f"Bike status must be one of {BIKE_STATUSES}")
         self._status = value
 
+    def __str__(self) -> str:
+        return f"Bike(id={self.id}, type={self.type}, status={self.status})"
+
+    def __repr__(self) -> str:
+        return f"Bike(id={self.id!r}, type={self.type!r}, status={self.status!r})"
+
 
 class ClassicBike(Bike):
     """Classic bike with gear system.
@@ -131,6 +137,12 @@ class ClassicBike(Bike):
         if not isinstance(value, int) or value < 1:
             raise ValueError("Gear count must be a positive integer")
         self._gear_count = value
+
+    def __str__(self) -> str:
+        return f"ClassicBike(id={self.id}, status={self.status}, gears={self.gear_count})"
+
+    def __repr__(self) -> str:
+        return f"ClassicBike(id={self.id!r}, status={self.status!r}, gear_count={self.gear_count!r})"
 
 
 class ElectricBike(Bike):
@@ -177,6 +189,12 @@ class ElectricBike(Bike):
         if value < 0:
             raise ValueError("Max range must be non-negative")
         self._max_range_km = value
+
+    def __str__(self) -> str:
+        return f"ElectricBike(id={self.id}, status={self.status}, battery={self.battery_level}%, range={self.max_range_km}km)"
+
+    def __repr__(self) -> str:
+        return f"ElectricBike(id={self.id!r}, status={self.status!r}, battery_level={self.battery_level!r}, max_range_km={self.max_range_km!r})"
 
 
 class Station(Entity):
@@ -242,6 +260,14 @@ class Station(Entity):
             raise ValueError("Invalid latitude or longitude")
         self._location = (lat, lon)
 
+    def __str__(self) -> str:
+        return f"Station(id={self.id}, name={self.name}, capacity={self.capacity})"
+
+    def __repr__(self) -> str:
+        lat, lon = self.location
+        return f"Station(id={self.id!r}, name={self.name!r}, capacity={self.capacity!r}, latitude={lat!r}, longitude={lon!r})"
+
+
 class Trip(Entity):
     """Trip record representing a single bike rental.
 
@@ -298,6 +324,16 @@ class Trip(Entity):
         if value < 0:
             raise ValueError("Distance must be non-negative")
         self._distance_km = value
+
+    def __str__(self) -> str:
+        return f"Trip(id={self.id}, user={self.user.id}, bike={self.bike.id}, distance={self.distance_km}km)"
+
+    def __repr__(self) -> str:
+        return (
+            f"Trip(id={self.id!r}, user_id={self.user.id!r}, bike_id={self.bike.id!r}, "
+            f"start_station={self.start_station.id!r}, end_station={self.end_station.id!r}, "
+            f"start_time={self.start_time!r}, end_time={self.end_time!r}, distance_km={self.distance_km!r})"
+        )
 
 
 class User(Entity):
@@ -359,6 +395,12 @@ class User(Entity):
             raise ValueError(f"User type must be one of {USER_TYPES}")
         self._type = value
 
+    def __str__(self) -> str:
+        return f"User(id={self.id}, name={self.name}, type={self.type})"
+
+    def __repr__(self) -> str:
+        return f"User(id={self.id!r}, name={self.name!r}, email={self.email!r}, type={self.type!r})"
+
 
 class CasualUser(User):
     """Casual user with pay-per-ride access.
@@ -390,6 +432,12 @@ class CasualUser(User):
         if not isinstance(value, int) or value < 0:
             raise ValueError("Day pass count must be a non-negative integer")
         self._day_pass_count = value
+
+    def __str__(self) -> str:
+        return f"CasualUser(id={self.id}, name={self.name}, passes={self.day_pass_count})"
+
+    def __repr__(self) -> str:
+        return f"CasualUser(id={self.id!r}, name={self.name!r}, email={self.email!r}, day_pass_count={self.day_pass_count!r})"
 
 
 class MemberUser(User):
@@ -436,6 +484,15 @@ class MemberUser(User):
         if value not in MEMBER_TIERS:
             raise ValueError(f"Tier must be one of {MEMBER_TIERS}")
         self._tier = value
+
+    def __str__(self) -> str:
+        return f"MemberUser(id={self.id}, name={self.name}, tier={self.tier})"
+
+    def __repr__(self) -> str:
+        return (
+            f"MemberUser(id={self.id!r}, name={self.name!r}, email={self.email!r}, "
+            f"tier={self.tier!r}, start={self.membership_start_date!r}, end={self.membership_end_date!r})"
+        )
 
 
 class MaintenanceRecord:
