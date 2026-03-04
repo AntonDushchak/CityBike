@@ -1,23 +1,43 @@
-"""
-Validation, formatting, helpers
-"""
+"""Validation, formatting, and helper functions for data cleaning."""
+
+from datetime import datetime
+from typing import Optional, Union
 
 import pandas as pd
-from datetime import datetime
 
 from models import BIKE_TYPES, USER_TYPES
 
-def validate_data_trips(trip):
-    """Return boolean mask for valid trip rows in DataFrame"""
-    required = ["trip_id", "user_id", "user_type", "bike_id", "bike_type", "start_station_id", "end_station_id", "start_time", "end_time", "duration_minutes", "distance_km", "status"]
+
+def validate_data_trips(trip: pd.DataFrame) -> pd.Series:
+    """Return boolean mask for valid trip rows in DataFrame.
+
+    Args:
+        trip: DataFrame containing trip data.
+
+    Returns:
+        Boolean Series where True indicates a valid row.
+    """
+    required = [
+        "trip_id", "user_id", "user_type", "bike_id", "bike_type",
+        "start_station_id", "end_station_id", "start_time", "end_time",
+        "duration_minutes", "distance_km", "status",
+    ]
     mask = trip[required].notnull().all(axis=1)
     mask &= trip["duration_minutes"].apply(lambda x: isinstance(x, (int, float)) and x >= 0)
     mask &= trip["distance_km"].apply(lambda x: isinstance(x, (int, float)) and x >= 0)
     mask &= trip["end_time"] >= trip["start_time"]
     return mask
 
-def validate_data_stations(station):
-    """Return boolean mask for valid station rows in DataFrame"""
+
+def validate_data_stations(station: pd.DataFrame) -> pd.Series:
+    """Return boolean mask for valid station rows in DataFrame.
+
+    Args:
+        station: DataFrame containing station data.
+
+    Returns:
+        Boolean Series where True indicates a valid row.
+    """
     required = ["station_id", "station_name", "capacity", "latitude", "longitude"]
     mask = station[required].notnull().all(axis=1)
     mask &= station["capacity"].apply(lambda x: isinstance(x, (int, float)) and x >= 1)
@@ -25,15 +45,34 @@ def validate_data_stations(station):
     mask &= station["longitude"].apply(lambda x: isinstance(x, (int, float)) and -180 <= x <= 180)
     return mask
 
-def validate_data_maintenance(maintenance):
-    """Return boolean mask for valid maintenance rows in DataFrame"""
-    required = ["record_id", "bike_id", "bike_type", "date", "maintenance_type", "cost", "description"]
+
+def validate_data_maintenance(maintenance: pd.DataFrame) -> pd.Series:
+    """Return boolean mask for valid maintenance rows in DataFrame.
+
+    Args:
+        maintenance: DataFrame containing maintenance data.
+
+    Returns:
+        Boolean Series where True indicates a valid row.
+    """
+    required = [
+        "record_id", "bike_id", "bike_type", "date",
+        "maintenance_type", "cost", "description",
+    ]
     mask = maintenance[required].notnull().all(axis=1)
     mask &= maintenance["cost"].apply(lambda x: isinstance(x, (int, float)) and x >= 0)
     return mask
 
-def clean_data_trips(trips):
-    """Clean and standardize trip data in DataFrame"""
+
+def clean_data_trips(trips: pd.DataFrame) -> pd.DataFrame:
+    """Clean and standardize trip data in DataFrame.
+
+    Args:
+        trips: Raw trip DataFrame.
+
+    Returns:
+        Cleaned DataFrame with valid rows only.
+    """
     df = trips.copy()
 
     df["start_time"] = pd.to_datetime(df["start_time"], errors="coerce")
@@ -52,8 +91,16 @@ def clean_data_trips(trips):
     df = df[mask]
     return df
 
-def clean_data_stations(stations):
-    """Clean and standardize station data in DataFrame"""
+
+def clean_data_stations(stations: pd.DataFrame) -> pd.DataFrame:
+    """Clean and standardize station data in DataFrame.
+
+    Args:
+        stations: Raw station DataFrame.
+
+    Returns:
+        Cleaned DataFrame with valid rows only.
+    """
     df = stations.copy()
 
     df["capacity"] = pd.to_numeric(df["capacity"], errors="coerce")
@@ -68,8 +115,16 @@ def clean_data_stations(stations):
     df = df[mask]
     return df
 
-def clean_data_maintenance(maintenance):
-    """Clean and standardize maintenance data in DataFrame"""
+
+def clean_data_maintenance(maintenance: pd.DataFrame) -> pd.DataFrame:
+    """Clean and standardize maintenance data in DataFrame.
+
+    Args:
+        maintenance: Raw maintenance DataFrame.
+
+    Returns:
+        Cleaned DataFrame with valid rows only.
+    """
     df = maintenance.copy()
 
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
@@ -84,8 +139,16 @@ def clean_data_maintenance(maintenance):
     df = df[mask]
     return df
 
-def format_duration(seconds):
-    """Format duration in human-readable format (e.g., 1h 2m 3s). Returns None if invalid."""
+
+def format_duration(seconds: Union[int, float]) -> Optional[str]:
+    """Format duration in human-readable format (e.g., 1h 2m 3s).
+
+    Args:
+        seconds: Duration in seconds.
+
+    Returns:
+        Formatted string or None if invalid.
+    """
     try:
         if not isinstance(seconds, (int, float)) or seconds < 0:
             return None
@@ -104,8 +167,16 @@ def format_duration(seconds):
     except Exception:
         return None
 
-def format_date(timestamp):
-    """Format date in standard format. Returns datetime or None if invalid."""
+
+def format_date(timestamp: Union[str, int, float, datetime, None]) -> Optional[datetime]:
+    """Parse various timestamp formats into a datetime object.
+
+    Args:
+        timestamp: Input timestamp (string, number, or datetime).
+
+    Returns:
+        Parsed datetime or None if invalid.
+    """
     try:
         if timestamp is None:
             return None
@@ -128,8 +199,16 @@ def format_date(timestamp):
         return None
     return None
 
-def clean_data_users(trips):
-    """Create cleaned users DataFrame from trips data"""
+
+def clean_data_users(trips: pd.DataFrame) -> pd.DataFrame:
+    """Create cleaned users DataFrame from trips data.
+
+    Args:
+        trips: Cleaned trips DataFrame.
+
+    Returns:
+        DataFrame with unique users and their types.
+    """
     df = trips.copy()
     
     df["user_id"] = df["user_id"].astype(str)
@@ -143,8 +222,17 @@ def clean_data_users(trips):
     
     return users_df.reset_index(drop=True)
 
-def clean_data_bikes(trips, maintenance):
-    """Create cleaned bikes DataFrame from trips and maintenance data"""
+
+def clean_data_bikes(trips: pd.DataFrame, maintenance: pd.DataFrame) -> pd.DataFrame:
+    """Create cleaned bikes DataFrame from trips and maintenance data.
+
+    Args:
+        trips: Cleaned trips DataFrame.
+        maintenance: Cleaned maintenance DataFrame.
+
+    Returns:
+        DataFrame with unique bikes, their types, and statuses.
+    """
     trips_df = trips.copy()
     maintenance_df = maintenance.copy()
     

@@ -1,11 +1,25 @@
-"""
-Sorting, searching implementations
-"""
+"""Custom sorting and searching algorithm implementations."""
+
+from typing import Any, Callable, List, TypeVar
+
 import pandas as pd
 
+T = TypeVar("T")
 
-def my_sort(arr, key):
-    """My merge sort implementation with key support."""
+
+def my_sort(arr: List[T], key: Callable[[T], Any]) -> List[T]:
+    """Merge sort implementation with key support.
+
+    Time complexity: O(n log n)
+    Space complexity: O(n)
+
+    Args:
+        arr: List of items to sort.
+        key: Function to extract comparison key from each item.
+
+    Returns:
+        New sorted list.
+    """
 
     if len(arr) <= 1:
         return arr
@@ -28,12 +42,36 @@ def my_sort(arr, key):
     merged.extend(right[j:])
     return merged
 
-def python_sort(arr, key):
-    """Python built-in sort with key support"""
+
+def python_sort(arr: List[T], key: Callable[[T], Any]) -> List[T]:
+    """Python built-in sort with key support.
+
+    Time complexity: O(n log n) - Timsort
+
+    Args:
+        arr: List of items to sort.
+        key: Function to extract comparison key.
+
+    Returns:
+        New sorted list.
+    """
     return sorted(arr, key=key)
 
-def my_search(arr, target, key):
-    """My search implementation. E.g. binary search with key support"""
+
+def my_search(arr: List[T], target: T, key: Callable[[T], Any]) -> int:
+    """Binary search implementation with key support.
+
+    Time complexity: O(log n)
+    Requires arr to be sorted by key.
+
+    Args:
+        arr: Sorted list of items.
+        target: Item to search for.
+        key: Function to extract comparison key.
+
+    Returns:
+        Index of target if found, -1 otherwise.
+    """
     left = 0
     right = len(arr) - 1
 
@@ -50,8 +88,20 @@ def my_search(arr, target, key):
 
     return -1
 
-def pandas_search(arr, target, key):
-    """Pandas search using .loc[] with key support."""
+
+def pandas_search(arr: List[T], target: T, key: Callable[[T], Any]) -> int:
+    """Search using pandas DataFrame filtering.
+
+    Time complexity: O(n)
+
+    Args:
+        arr: List of items (converted to DataFrame).
+        target: Item to search for.
+        key: Function to extract comparison key.
+
+    Returns:
+        Index of first match if found, -1 otherwise.
+    """
 
     df = pd.DataFrame(arr)
     mask = df.apply(lambda x: key(x) == key(target), axis=1)

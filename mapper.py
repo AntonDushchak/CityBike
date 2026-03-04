@@ -1,8 +1,23 @@
-import models
-import factories
+"""Convert DataFrames to domain model objects."""
 
-def dataframe_to_bikes(df, active=True):
-    """Convert a DataFrame of bike data into a list of Bike objects"""
+from typing import Dict, List, Optional
+
+import pandas as pd
+
+import factories
+import models
+
+
+def dataframe_to_bikes(df: pd.DataFrame, active: bool = True) -> List[models.Bike]:
+    """Convert a DataFrame of bike data into a list of Bike objects.
+
+    Args:
+        df: DataFrame with bike_id, bike_type, and status columns.
+        active: If True, bikes are set to available/in_use; otherwise maintenance.
+
+    Returns:
+        List of Bike instances.
+    """
     bikes = []
     classic_factory = factories.ClassicBikeFactory()
     electric_factory = factories.ElectricBikeFactory()
@@ -21,8 +36,16 @@ def dataframe_to_bikes(df, active=True):
         bikes.append(bike)
     return bikes
 
-def dataframe_to_stations(df):
-    """Convert a DataFrame of station data into a list of Station objects"""
+
+def dataframe_to_stations(df: pd.DataFrame) -> List[models.Station]:
+    """Convert a DataFrame of station data into a list of Station objects.
+
+    Args:
+        df: DataFrame with station columns.
+
+    Returns:
+        List of Station instances.
+    """
     stations = []
     for _, row in df.iterrows():
         station = models.Station(
@@ -34,8 +57,19 @@ def dataframe_to_stations(df):
         stations.append(station)
     return stations
 
-def dataframe_to_maintenance_records(df, bikes):
-    """Convert a DataFrame of maintenance data into a list of MaintenanceRecord objects"""
+
+def dataframe_to_maintenance_records(
+    df: pd.DataFrame, bikes: List[models.Bike]
+) -> List[models.MaintenanceRecord]:
+    """Convert a DataFrame of maintenance data into a list of MaintenanceRecord objects.
+
+    Args:
+        df: DataFrame with maintenance columns.
+        bikes: List of Bike objects to link records to.
+
+    Returns:
+        List of MaintenanceRecord instances.
+    """
     bikes_dict = {bike.id: bike for bike in bikes}
     records = []
     for _, row in df.iterrows():
@@ -53,11 +87,27 @@ def dataframe_to_maintenance_records(df, bikes):
         records.append(record)
     return records
 
-def dataframe_to_trips(df, users, bikes, stations):
-    """Convert a DataFrame of trip data into a list of Trip objects"""
-    users_dict = {user.id: user for user in users}
-    bikes_dict = {bike.id: bike for bike in bikes}
-    stations_dict = {station.id: station for station in stations}
+
+def dataframe_to_trips(
+    df: pd.DataFrame,
+    users: List[models.User],
+    bikes: List[models.Bike],
+    stations: List[models.Station],
+) -> List[models.Trip]:
+    """Convert a DataFrame of trip data into a list of Trip objects.
+
+    Args:
+        df: DataFrame with trip columns.
+        users: List of User objects.
+        bikes: List of Bike objects.
+        stations: List of Station objects.
+
+    Returns:
+        List of Trip instances.
+    """
+    users_dict: Dict[str, models.User] = {user.id: user for user in users}
+    bikes_dict: Dict[str, models.Bike] = {bike.id: bike for bike in bikes}
+    stations_dict: Dict[str, models.Station] = {station.id: station for station in stations}
     
     trips = []
     for _, row in df.iterrows():
@@ -82,9 +132,17 @@ def dataframe_to_trips(df, users, bikes, stations):
         trips.append(trip)
     return trips
 
-def dataframe_to_users(df):
-    """Convert a DataFrame of trip data into a list of User objects"""
-    users = {}
+
+def dataframe_to_users(df: pd.DataFrame) -> List[models.User]:
+    """Convert a DataFrame of trip data into a list of User objects.
+
+    Args:
+        df: DataFrame with user_id and user_type columns.
+
+    Returns:
+        List of User instances.
+    """
+    users: Dict[str, models.User] = {}
     casual_factory = factories.CasualUserFactory()
     member_factory = factories.MemberUserFactory()
     for _, row in df.iterrows():
