@@ -3,6 +3,10 @@
 from pathlib import Path
 from typing import Dict, List, Optional
 
+import matplotlib
+
+matplotlib.use("Agg", force=True)
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.lines import Line2D
@@ -68,7 +72,8 @@ def plot_trips_per_station(
     ax.set_xlabel("Station")
     ax.set_ylabel("Trips (count)")
     ax.legend()
-    ax.tick_params(axis="x", rotation=45, ha="right")
+    ax.tick_params(axis="x", rotation=45)
+    plt.setp(ax.get_xticklabels(), ha="right")
     fig.tight_layout()
     return save_figure(fig, "bar_trips_per_station.png", output_dir)
 

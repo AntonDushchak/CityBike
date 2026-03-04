@@ -132,7 +132,10 @@ class AnalyticsReporter:
             return "  (no data)"
         display_df = df.copy()
         if columns:
-            display_df = display_df[columns]
+            existing = [col for col in columns if col in display_df.columns]
+            if not existing:
+                return "  (no data)"
+            display_df = display_df[existing]
         return display_df.head(max_rows).to_string(index=False)
 
     def _trip_summary(self) -> Dict[str, float]:
@@ -157,8 +160,8 @@ class AnalyticsReporter:
             counts = (
                 self.trips[column]
                 .value_counts()
-                .reset_index()
-                .rename(columns={"index": "station_id", column: "trip_count"})
+                .reset_index(name="trip_count")
+                .rename(columns={column: "station_id"})
                 .head(10)
             )
             if lookup is not None:
@@ -173,7 +176,9 @@ class AnalyticsReporter:
         if self.trips.empty or "start_time" not in self.trips:
             return pd.DataFrame(columns=["hour", "trip_count"])
         hours = self.trips["start_time"].dt.hour
-        return hours.value_counts().sort_index().reset_index().rename(columns={"index": "hour", "start_time": "trip_count"})
+        counts = hours.value_counts().sort_index().reset_index(name="trip_count")
+        counts.columns = ["hour", "trip_count"]
+        return counts
 
     def _weekday_volume(self) -> pd.DataFrame:
         if self.trips.empty or "start_time" not in self.trips:
@@ -181,7 +186,9 @@ class AnalyticsReporter:
         weekdays = self.trips["start_time"].dt.day_name()
         ordered = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         counts = weekdays.value_counts().reindex(ordered, fill_value=0)
-        return counts.reset_index().rename(columns={"index": "weekday", "start_time": "trip_count"})
+        counts = counts.reset_index().rename(columns={"index": "weekday"})
+        counts = counts.rename(columns={counts.columns[1]: "trip_count"})
+        return counts
 
     def _distance_by_user_type(self) -> pd.DataFrame:
         if self.trips.empty or "user_type" not in self.trips:

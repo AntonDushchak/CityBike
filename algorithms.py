@@ -3,14 +3,30 @@ Sorting, searching implementations
 """
 import pandas as pd
 
+
 def my_sort(arr, key):
-    """My sort implementation. E.g. quick sort with key support"""
+    """My merge sort implementation with key support."""
+
     if len(arr) <= 1:
         return arr
-    pivot = arr[0]
-    left = [x for x in arr[1:] if key(x) < key(pivot)]
-    right = [x for x in arr[1:] if key(x) >= key(pivot)]
-    return my_sort(left, key) + [pivot] + my_sort(right, key)
+
+    mid = len(arr) // 2
+    left = my_sort(arr[:mid], key)
+    right = my_sort(arr[mid:], key)
+
+    merged = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if key(left[i]) <= key(right[j]):
+            merged.append(left[i])
+            i += 1
+        else:
+            merged.append(right[j])
+            j += 1
+
+    merged.extend(left[i:])
+    merged.extend(right[j:])
+    return merged
 
 def python_sort(arr, key):
     """Python built-in sort with key support"""

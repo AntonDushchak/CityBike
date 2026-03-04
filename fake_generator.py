@@ -1,5 +1,5 @@
 import datetime
-from random import random
+import random
 
 def generate_fake_start_and_end_date():
     """Generate random start and end dates for trips"""
