@@ -53,6 +53,14 @@ def main():
     else:
         print("No visualizations generated (insufficient data).")
 
+    benchmark_artifacts = system.benchmark_algorithms()
+    benchmark_figure = benchmark_artifacts.get("figure_path")
+
+    if benchmark_figure:
+        print(f"Algorithm benchmark figure saved to {benchmark_figure}")
+    else:
+        print(benchmark_artifacts.get("message", "Benchmark figure was not generated."))
+
     algo_results = system.apply_custom_algorithms()
     for message in algo_results.get("messages", []):
         print(message)
