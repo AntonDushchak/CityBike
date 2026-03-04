@@ -208,3 +208,5 @@ __marimo__/
 
 # Project specific generated artifacts
 output/
+data/
+!data/.gitkeep
