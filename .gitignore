@@ -208,5 +208,6 @@ __marimo__/
 
 # Project specific generated artifacts
 output/
-data/
-!data/.gitkeep
+
+# Data files - keep raw CSVs, ignore generated clean versions
+data/*_clean.csv

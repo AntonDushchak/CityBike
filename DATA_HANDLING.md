@@ -16,6 +16,19 @@ This document describes the data validation, cleaning, and missing data handling
 
 ## Missing Data Handling Strategy
 
+### Rationale: Drop vs Fill
+
+We chose to **drop rows with missing values** rather than impute (fill) them for the following reasons:
+
+| Approach | When to Use | Why We Chose Drop |
+|----------|-------------|-------------------|
+| **Drop** | Critical fields where imputation would introduce bias | Trip IDs, station IDs, and timestamps are identifiers — filling them with synthetic values would create false records |
+| **Fill (Mean/Median)** | Continuous numeric data with random missingness | `duration_minutes` and `distance_km` could theoretically be imputed, but missing values often indicate incomplete/cancelled trips rather than random sensor failures |
+| **Fill (Mode)** | Categorical data with small % missing | Our categorical fields (`user_type`, `bike_type`) have very low missing rates; imputing would add noise without significant benefit |
+| **Interpolate** | Time-series with temporal patterns | Not applicable — our data is transactional, not continuous time-series |
+
+**Key Decision:** Since the raw dataset has only ~2-6% missing values (by design from the generator), dropping invalid rows preserves data integrity without significantly reducing sample size. This approach ensures all analytics are based on complete, verified records rather than estimates.
+
 ### 1. Required Fields
 
 Rows with `NULL` values in required fields are **removed** from the dataset.
