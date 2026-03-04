@@ -125,3 +125,45 @@ def format_date(timestamp):
     except Exception:
         return None
     return None
+
+def clean_data_users(trips):
+    """Create cleaned users DataFrame from trips data"""
+    df = trips.copy()
+    
+    df["user_id"] = df["user_id"].astype(str)
+    df["user_type"] = df["user_type"].astype(str).str.lower().str.strip()
+    
+    users_df = df[["user_id", "user_type"]].drop_duplicates(subset=["user_id"])
+    
+    users_df = users_df.dropna()
+    
+    valid_types = ["casual", "member"]
+    users_df = users_df[users_df["user_type"].isin(valid_types)]
+    
+    return users_df.reset_index(drop=True)
+
+def clean_data_bikes(trips, maintenance):
+    """Create cleaned bikes DataFrame from trips and maintenance data"""
+    trips_df = trips.copy()
+    maintenance_df = maintenance.copy()
+    
+    trips_bikes = trips_df[["bike_id", "bike_type"]].copy()
+    trips_bikes["status"] = "available"
+    
+    maintenance_bikes = maintenance_df[["bike_id", "bike_type"]].copy()
+    maintenance_bikes["status"] = "maintenance"
+    
+    bikes_df = pd.concat([trips_bikes, maintenance_bikes], ignore_index=True)
+    
+    bikes_df["bike_id"] = bikes_df["bike_id"].astype(str)
+    bikes_df["bike_type"] = bikes_df["bike_type"].astype(str).str.lower().str.strip()
+    bikes_df["status"] = bikes_df["status"].astype(str).str.lower().str.strip()
+    
+    bikes_df = bikes_df.drop_duplicates(subset=["bike_id"], keep="first")
+    
+    bikes_df = bikes_df.dropna()
+    
+    valid_types = ["classic", "electric"]
+    bikes_df = bikes_df[bikes_df["bike_type"].isin(valid_types)]
+    
+    return bikes_df.reset_index(drop=True)
