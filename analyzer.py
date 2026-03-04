@@ -23,7 +23,6 @@ from visualization import (
     plot_benchmark_comparison,
 )
 
-
 class BikeShareSystem:
     """Orchestrate loading, cleaning, analysis, reporting, and demos.
 
@@ -68,6 +67,27 @@ class BikeShareSystem:
         self.maintenance: Optional[pd.DataFrame] = None
         self.users: Optional[pd.DataFrame] = None
         self.bikes: Optional[pd.DataFrame] = None
+
+    def run_pipeline(self) -> Dict[str, object]:
+        """Execute the complete analytics pipeline.
+
+        Loads data, cleans it, exports cleaned datasets, generates insights,
+        exports summary tables, creates visualizations, and runs benchmarks.
+
+        Returns:
+            Dictionary containing all pipeline artifacts and results.
+        """
+        self.load_data()
+        self.clean_data()
+
+        results: Dict[str, object] = {}
+        results["clean_exports"] = self.export_clean_data()
+        results["insights"] = self.generate_insights()
+        results["summary_exports"] = self.export_summary_tables()
+        results["figures"] = self.generate_figures()
+        results["benchmarks"] = self.benchmark_algorithms()
+        results["algorithm_demo"] = self.apply_custom_algorithms()
+        return results
 
     def load_data(self) -> "BikeShareSystem":
         """Load raw CSV files into DataFrames.
@@ -129,27 +149,6 @@ class BikeShareSystem:
             trips_path,
             maintenance_path,
         )
-
-    def run_pipeline(self) -> Dict[str, object]:
-        """Execute the complete analytics pipeline.
-
-        Loads data, cleans it, exports cleaned datasets, generates insights,
-        exports summary tables, creates visualizations, and runs benchmarks.
-
-        Returns:
-            Dictionary containing all pipeline artifacts and results.
-        """
-        self.load_data()
-        self.clean_data()
-
-        results: Dict[str, object] = {}
-        results["clean_exports"] = self.export_clean_data()
-        results["insights"] = self.generate_insights()
-        results["summary_exports"] = self.export_summary_tables()
-        results["figures"] = self.generate_figures()
-        results["benchmarks"] = self.benchmark_algorithms()
-        results["algorithm_demo"] = self.apply_custom_algorithms()
-        return results
 
     def _reporter(self) -> AnalyticsReporter:
         return AnalyticsReporter(self.users, self.bikes, self.stations, self.trips, self.maintenance)

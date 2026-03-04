@@ -39,20 +39,6 @@ COLOR_PALETTE = [
 
 plt.style.use("seaborn-v0_8-whitegrid")
 
-def _ensure_dir(output_dir: Path) -> Path:
-    directory = Path(output_dir) if output_dir else FIGURES_DIR
-    directory.mkdir(parents=True, exist_ok=True)
-    return directory
-
-def save_figure(fig: plt.Figure, filename: str, output_dir: Path = FIGURES_DIR) -> str:
-    """Save figure to the output directory and close it."""
-
-    directory = _ensure_dir(output_dir)
-    filepath = directory / filename
-    fig.savefig(filepath, dpi=300, bbox_inches="tight")
-    plt.close(fig)
-    return str(filepath)
-
 def plot_trips_per_station(
     trips_df: pd.DataFrame,
     stations_df: Optional[pd.DataFrame] = None,
@@ -219,3 +205,17 @@ def plot_benchmark_comparison(
 
     fig.tight_layout()
     return save_figure(fig, "bar_algorithm_benchmark.png", output_dir)
+
+def _ensure_dir(output_dir: Path) -> Path:
+    directory = Path(output_dir) if output_dir else FIGURES_DIR
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory
+
+def save_figure(fig: plt.Figure, filename: str, output_dir: Path = FIGURES_DIR) -> str:
+    """Save figure to the output directory and close it."""
+
+    directory = _ensure_dir(output_dir)
+    filepath = directory / filename
+    fig.savefig(filepath, dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    return str(filepath)
