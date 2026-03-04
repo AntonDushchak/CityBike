@@ -1,5 +1,6 @@
 """BikeShareSystem orchestration layer."""
 
+from pathlib import Path
 from timeit import timeit
 from typing import Dict, List, Optional
 
@@ -71,6 +72,53 @@ class BikeShareSystem:
         report_text = reporter.build_report_text(metrics)
         saved_path = reporter.save_report(report_text, report_path)
         return {"report_path": saved_path, "metrics": metrics}
+
+    def export_summary_tables(self, output_dir: str = "output") -> Dict[str, str]:
+        """Export top stations, top users, and maintenance summaries to CSV."""
+
+        reporter = self._reporter()
+        metrics = reporter.compute_metrics()
+        out_dir = Path(output_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        exports: Dict[str, str] = {}
+
+        # Top stations (start + end combined with role flag)
+        top_stations = metrics.get("top_stations")
+        combined_frames: List[pd.DataFrame] = []
+        if isinstance(top_stations, dict):
+            for role, df in top_stations.items():
+                if df is not None and not df.empty:
+                    tmp = df.copy()
+                    tmp["station_role"] = role
+                    combined_frames.append(tmp)
+        if combined_frames:
+            stations_df = pd.concat(combined_frames, ignore_index=True)
+            station_path = out_dir / "top_stations.csv"
+            stations_df.to_csv(station_path, index=False)
+            exports["top_stations"] = str(station_path)
+
+        # Top users
+        top_users = metrics.get("top_users")
+        if isinstance(top_users, pd.DataFrame) and not top_users.empty:
+            users_path = out_dir / "top_users.csv"
+            top_users.to_csv(users_path, index=False)
+            exports["top_users"] = str(users_path)
+
+        # Maintenance summaries (cost + frequency)
+        maintenance_cost = metrics.get("maintenance_cost")
+        if isinstance(maintenance_cost, pd.DataFrame) and not maintenance_cost.empty:
+            cost_path = out_dir / "maintenance_costs.csv"
+            maintenance_cost.to_csv(cost_path, index=False)
+            exports["maintenance_costs"] = str(cost_path)
+
+        maintenance_frequency = metrics.get("maintenance_frequency")
+        if isinstance(maintenance_frequency, pd.DataFrame) and not maintenance_frequency.empty:
+            freq_path = out_dir / "maintenance_frequency.csv"
+            maintenance_frequency.to_csv(freq_path, index=False)
+            exports["maintenance_frequency"] = str(freq_path)
+
+        return exports
 
     def generate_figures(self) -> List[str]:
         """Produce the required Matplotlib charts and return saved paths."""
