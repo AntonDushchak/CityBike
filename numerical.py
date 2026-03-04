@@ -1,11 +1,20 @@
-"""
-NumPy-based computations
-"""
+"""NumPy-based numerical computations for distance, statistics, and outliers."""
+
+from typing import Any, Dict, List, Union
 
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
-def calculate_statistics(data):
-    """Calculate statistical metrics"""
+
+def calculate_statistics(data: ArrayLike) -> Dict[str, float]:
+    """Calculate statistical metrics for a dataset.
+
+    Args:
+        data: Input array-like data.
+
+    Returns:
+        Dictionary with mean, median, variance, std, min, max, count.
+    """
     
     data = np.array(data)
 
@@ -19,9 +28,20 @@ def calculate_statistics(data):
         "count": data.size
     }
 
-def compute_distance_matrix(positions1, positions2):
-    """
-    Compute distance matrix between two sets of positions (lat, lon) using Euclidean distance.
+
+def compute_distance_matrix(
+    positions1: ArrayLike, positions2: ArrayLike
+) -> NDArray[np.floating[Any]]:
+    """Compute distance matrix between two sets of positions using Euclidean distance.
+
+    Uses simplified flat-earth model (not Haversine).
+
+    Args:
+        positions1: Array of (lat, lon) coordinates, shape (n, 2).
+        positions2: Array of (lat, lon) coordinates, shape (m, 2).
+
+    Returns:
+        Distance matrix of shape (n, m).
     """
 
     pos1 = np.asarray(positions1)
@@ -32,23 +52,60 @@ def compute_distance_matrix(positions1, positions2):
     dist = np.sqrt(dlat ** 2 + dlon ** 2)
     return dist
 
-def normalize_data(data, axis=-1, order=2):
+
+def normalize_data(
+    data: ArrayLike, axis: int = -1, order: int = 2
+) -> NDArray[np.floating[Any]]:
+    """Normalize data along specified axis using L-norm.
+
+    Args:
+        data: Input array.
+        axis: Axis along which to normalize.
+        order: Order of the norm (default L2).
+
+    Returns:
+        Normalized array.
+    """
     l2 = np.atleast_1d(np.linalg.norm(data, order, axis))
-    l2[l2==0] = 1
+    l2[l2 == 0] = 1
     return data / np.expand_dims(l2, axis)
 
-def batch_calculate_fares(distances_km, base_rate=1.0, per_km_rate=0.5, min_fare=2.0):
-    """
-    Calculate fares for multiple trips in batch using vectorized operations.
+
+def batch_calculate_fares(
+    distances_km: ArrayLike,
+    base_rate: float = 1.0,
+    per_km_rate: float = 0.5,
+    min_fare: float = 2.0,
+) -> NDArray[np.floating[Any]]:
+    """Calculate fares for multiple trips using vectorized operations.
+
+    Args:
+        distances_km: Array of trip distances.
+        base_rate: Base fare amount.
+        per_km_rate: Rate per kilometer.
+        min_fare: Minimum fare amount.
+
+    Returns:
+        Array of fare amounts.
     """
 
     distances = np.asarray(distances_km)
     fares = base_rate + (distances * per_km_rate)
     return np.maximum(fares, min_fare)
 
-def batch_calculate_fares_with_strategy(distances_km, strategy_rates, min_fare=2.0):
-    """
-    Calculate fares for multiple trips with different pricing strategies.
+
+def batch_calculate_fares_with_strategy(
+    distances_km: ArrayLike, strategy_rates: ArrayLike, min_fare: float = 2.0
+) -> NDArray[np.floating[Any]]:
+    """Calculate fares using different pricing strategies per trip.
+
+    Args:
+        distances_km: Array of trip distances.
+        strategy_rates: Array of rates corresponding to each trip.
+        min_fare: Minimum fare amount.
+
+    Returns:
+        Array of fare amounts.
     """
 
     distances = np.asarray(distances_km)
@@ -56,9 +113,19 @@ def batch_calculate_fares_with_strategy(distances_km, strategy_rates, min_fare=2
     fares = distances * rates
     return np.maximum(fares, min_fare)
 
-def detect_outliers_zscore(data, threshold=3.0):
-    """
-    Detect outliers using Z-score method.
+
+def detect_outliers_zscore(
+    data: ArrayLike, threshold: float = 3.0
+) -> Dict[str, Union[NDArray[Any], float]]:
+    """Detect outliers using Z-score method.
+
+    Args:
+        data: Input array.
+        threshold: Z-score threshold for outlier detection.
+
+    Returns:
+        Dictionary with outlier_mask, outlier_indices, outlier_values,
+        z_scores, mean, and std.
     """
 
     data = np.asarray(data)
@@ -87,9 +154,18 @@ def detect_outliers_zscore(data, threshold=3.0):
         "std": std
     }
 
-def remove_outliers_zscore(data, threshold=3.0):
-    """
-    Remove outliers from data using Z-score method.
+
+def remove_outliers_zscore(
+    data: ArrayLike, threshold: float = 3.0
+) -> NDArray[np.floating[Any]]:
+    """Remove outliers from data using Z-score method.
+
+    Args:
+        data: Input array.
+        threshold: Z-score threshold.
+
+    Returns:
+        Array with outliers removed.
     """
     
     result = detect_outliers_zscore(data, threshold)

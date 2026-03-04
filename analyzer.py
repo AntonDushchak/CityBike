@@ -8,6 +8,7 @@ import pandas as pd
 
 from analytics_reporter import AnalyticsReporter
 from algorithms import my_sort, python_sort, my_search, pandas_search
+from loader import save_csv
 from visualization import (
     plot_trips_per_station,
     plot_monthly_trip_trend,
@@ -15,6 +16,12 @@ from visualization import (
     plot_duration_boxplot_by_user_type,
     plot_benchmark_comparison,
 )
+
+TRIP_PREVIEW_COUNT = 5
+STATION_SAMPLE_INDEX = 0
+BENCHMARK_SAMPLE_SIZE = 2000
+BENCHMARK_SORT_RUNS = 5
+BENCHMARK_SEARCH_RUNS = 250
 
 class BikeShareSystem:
     """Orchestrate loading, cleaning, analysis, reporting, and demos."""
@@ -28,43 +35,6 @@ class BikeShareSystem:
 
     def _reporter(self) -> AnalyticsReporter:
         return AnalyticsReporter(self.users, self.bikes, self.stations, self.trips, self.maintenance)
-
-    def analyze_trips(self):
-        reporter = self._reporter()
-        metrics = reporter.compute_metrics()
-        keys = [
-            "trip_summary",
-            "top_stations",
-            "peak_hours",
-            "weekday_volume",
-            "distance_by_user_type",
-            "bike_utilization",
-            "monthly_trend",
-            "top_users",
-            "top_routes",
-            "completion_rate",
-            "avg_trips_per_user",
-            "trip_outliers",
-        ]
-        return {key: metrics[key] for key in keys}
-
-    def analyze_stations(self):
-        reporter = self._reporter()
-        metrics = reporter.compute_metrics()
-        keys = ["top_stations", "peak_hours", "weekday_volume", "top_routes"]
-        return {key: metrics[key] for key in keys}
-
-    def analyze_users(self):
-        reporter = self._reporter()
-        metrics = reporter.compute_metrics()
-        keys = ["top_users", "distance_by_user_type", "avg_trips_per_user"]
-        return {key: metrics[key] for key in keys}
-
-    def analyze_maintenance(self):
-        reporter = self._reporter()
-        metrics = reporter.compute_metrics()
-        keys = ["maintenance_cost", "maintenance_frequency"]
-        return {key: metrics[key] for key in keys}
 
     def generate_insights(self, report_path: str = "output/summary_report.txt"):
         reporter = self._reporter()
@@ -95,27 +65,27 @@ class BikeShareSystem:
         if combined_frames:
             stations_df = pd.concat(combined_frames, ignore_index=True)
             station_path = out_dir / "top_stations.csv"
-            stations_df.to_csv(station_path, index=False)
+            save_csv(str(station_path), stations_df)
             exports["top_stations"] = str(station_path)
 
         # Top users
         top_users = metrics.get("top_users")
         if isinstance(top_users, pd.DataFrame) and not top_users.empty:
             users_path = out_dir / "top_users.csv"
-            top_users.to_csv(users_path, index=False)
+            save_csv(str(users_path), top_users)
             exports["top_users"] = str(users_path)
 
         # Maintenance summaries (cost + frequency)
         maintenance_cost = metrics.get("maintenance_cost")
         if isinstance(maintenance_cost, pd.DataFrame) and not maintenance_cost.empty:
             cost_path = out_dir / "maintenance_costs.csv"
-            maintenance_cost.to_csv(cost_path, index=False)
+            save_csv(str(cost_path), maintenance_cost)
             exports["maintenance_costs"] = str(cost_path)
 
         maintenance_frequency = metrics.get("maintenance_frequency")
         if isinstance(maintenance_frequency, pd.DataFrame) and not maintenance_frequency.empty:
             freq_path = out_dir / "maintenance_frequency.csv"
-            maintenance_frequency.to_csv(freq_path, index=False)
+            save_csv(str(freq_path), maintenance_frequency)
             exports["maintenance_frequency"] = str(freq_path)
 
         return exports
@@ -151,7 +121,7 @@ class BikeShareSystem:
             if trip_records:
                 sort_key_trip = lambda row: row["trip_id"]
                 sorted_trips = my_sort(trip_records, key=sort_key_trip)
-                result["trip_sort_ids"] = [row["trip_id"] for row in sorted_trips[:5]]
+                result["trip_sort_ids"] = [row["trip_id"] for row in sorted_trips[:TRIP_PREVIEW_COUNT]]
                 target_trip = sorted_trips[len(sorted_trips) // 2]
                 trip_index = my_search(sorted_trips, target_trip, key=sort_key_trip)
                 result["trip_search"] = {
@@ -169,7 +139,7 @@ class BikeShareSystem:
             if station_records:
                 sort_key_station = lambda row: row["station_id"]
                 sorted_stations = my_sort(station_records, key=sort_key_station)
-                target_station = sorted_stations[0]
+                target_station = sorted_stations[STATION_SAMPLE_INDEX]
                 station_index = my_search(sorted_stations, target_station, key=sort_key_station)
                 result["station_search"] = {
                     "station_id": target_station["station_id"],
@@ -183,7 +153,7 @@ class BikeShareSystem:
 
         return result
 
-    def benchmark_algorithms(self, sample_size: int = 2000) -> Dict[str, Optional[object]]:
+    def benchmark_algorithms(self, sample_size: int = BENCHMARK_SAMPLE_SIZE) -> Dict[str, Optional[object]]:
         """Compare custom vs native algorithms using timeit and return artifacts."""
 
         if self.trips is None or self.trips.empty or "trip_id" not in self.trips:
@@ -197,25 +167,22 @@ class BikeShareSystem:
             return {"results": None, "figure_path": None, "message": "Insufficient trip sample for benchmarks."}
 
         sort_key = lambda row: row["trip_id"]
-        sort_runs = 5
-        search_runs = 250
-
-        my_sort_time = timeit(lambda: my_sort(trip_sample, sort_key), number=sort_runs)
-        python_sort_time = timeit(lambda: python_sort(trip_sample, sort_key), number=sort_runs)
+        my_sort_time = timeit(lambda: my_sort(trip_sample, sort_key), number=BENCHMARK_SORT_RUNS)
+        python_sort_time = timeit(lambda: python_sort(trip_sample, sort_key), number=BENCHMARK_SORT_RUNS)
 
         sorted_sample = python_sort(trip_sample, sort_key)
         if not sorted_sample:
             return {"results": None, "figure_path": None, "message": "Sorted sample empty; benchmarks aborted."}
 
         target = sorted_sample[len(sorted_sample) // 2]
-        my_search_time = timeit(lambda: my_search(sorted_sample, target, sort_key), number=search_runs)
-        pandas_search_time = timeit(lambda: pandas_search(sorted_sample, target, sort_key), number=search_runs)
+        my_search_time = timeit(lambda: my_search(sorted_sample, target, sort_key), number=BENCHMARK_SEARCH_RUNS)
+        pandas_search_time = timeit(lambda: pandas_search(sorted_sample, target, sort_key), number=BENCHMARK_SEARCH_RUNS)
 
         benchmark_results = {
-            "my_sort": my_sort_time / sort_runs,
-            "python_sort": python_sort_time / sort_runs,
-            "my_search": my_search_time / search_runs,
-            "pandas_search": pandas_search_time / search_runs,
+            "my_sort": my_sort_time / BENCHMARK_SORT_RUNS,
+            "python_sort": python_sort_time / BENCHMARK_SORT_RUNS,
+            "my_search": my_search_time / BENCHMARK_SEARCH_RUNS,
+            "pandas_search": pandas_search_time / BENCHMARK_SEARCH_RUNS,
         }
 
         figure_path = plot_benchmark_comparison(benchmark_results)
