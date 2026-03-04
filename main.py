@@ -1,7 +1,6 @@
 from loader import load_csv, save_csv
 from analyzer import BikeShareSystem
 from utils import clean_data_stations, clean_data_trips, clean_data_maintenance, clean_data_users, clean_data_bikes
-from mapper import dataframe_to_stations, dataframe_to_trips, dataframe_to_maintenance_records, dataframe_to_bikes, dataframe_to_users
 
 stations_path = "data/stations.csv"
 trips_path = "data/trips.csv"

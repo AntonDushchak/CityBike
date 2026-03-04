@@ -219,23 +219,3 @@ def plot_benchmark_comparison(
 
     fig.tight_layout()
     return save_figure(fig, "bar_algorithm_benchmark.png", output_dir)
-
-def plot_usage_trends(trips_df, output_dir: Path = FIGURES_DIR):
-    """Alias for the monthly trip trend line chart."""
-
-    return plot_monthly_trip_trend(trips_df, output_dir=output_dir)
-
-def plot_station_popularity(trips_df, stations_df, output_dir: Path = FIGURES_DIR):
-    """Alias for the trips per station bar chart."""
-
-    return plot_trips_per_station(trips_df, stations_df, output_dir=output_dir)
-
-def plot_trip_distribution(trips_df, output_dir: Path = FIGURES_DIR):
-    """Alias for the trip duration histogram."""
-
-    return plot_trip_duration_histogram(trips_df, output_dir=output_dir)
-
-def plot_heatmap(trips_df, output_dir: Path = FIGURES_DIR):
-    """Alias for the user-type duration box plot (legacy name)."""
-
-    return plot_duration_boxplot_by_user_type(trips_df, output_dir=output_dir)
