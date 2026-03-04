@@ -11,6 +11,8 @@ stations_clean_path = "data/stations_clean.csv"
 trips_clean_path = "data/trips_clean.csv"
 maintenance_clean_path = "data/maintenance_clean.csv"
 
+
+
 def main():
     stations_raw = load_csv(stations_path)
     trips_raw = load_csv(trips_path)
@@ -36,6 +38,18 @@ def main():
 
     insights = system.generate_insights()
     print(f"Summary report saved to {insights['report_path']}")
+
+    figure_paths = system.generate_figures()
+    if figure_paths:
+        print("Saved visualization files:")
+        for path in figure_paths:
+            print(f"  - {path}")
+    else:
+        print("No visualizations generated (insufficient data).")
+
+    algo_results = system.apply_custom_algorithms()
+    for message in algo_results.get("messages", []):
+        print(message)
     
     # bikes = dataframe_to_bikes(trips_cleaned, active=True)
     # bikes.extend(dataframe_to_bikes(maintenance_cleaned, active=False))
