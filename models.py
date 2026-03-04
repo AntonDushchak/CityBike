@@ -1,7 +1,7 @@
 """
 OOP classes (Entity, Bike, Station, ...)
 """
-from abc import ABC
+from abc import ABC, abstractmethod
 from datetime import datetime
 
 BIKE_STATUSES = ("available", "in_use", "maintenance")
@@ -23,9 +23,11 @@ class Entity(ABC):
     def created_at(self):
         return self._created_at
 
+    @abstractmethod
     def __str__(self):
         return f"{self.__class__.__name__}(id={self.id}, created_at={self.created_at})"
     
+    @abstractmethod
     def __repr__(self):
         return self.__str__()
 
@@ -200,7 +202,7 @@ class User(Entity):
 
 class CasualUser(User):
     """Casual user model class"""
-    def __init__(self, id, name, email, day_pass_count):
+    def __init__(self, id, name, email, day_pass_count = 0):
         super().__init__(id, name, email, "casual")
         self.day_pass_count = day_pass_count
 
@@ -228,8 +230,8 @@ class MemberUser(User):
 
     @tier.setter
     def tier(self, value):
-        if value not in ("standard", "premium"):
-            raise ValueError("Tier must be 'standard' or 'premium'")
+        if value not in MEMBER_TIERS:
+            raise ValueError(f"Tier must be one of {MEMBER_TIERS}")
         self._tier = value
 
 class MaintenanceRecord:
@@ -251,3 +253,9 @@ class MaintenanceRecord:
         if value < 0:
             raise ValueError("Cost must be non-negative")
         self._cost = value
+
+    def __str__(self):
+        return f"MaintenanceRecord(id={self.id}, bike_id={self.bike.id}, date={self.date}, type={self.maintenance_type}, cost={self.cost})"
+    
+    def __repr__(self):
+        return self.__str__()
