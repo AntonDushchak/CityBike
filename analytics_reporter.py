@@ -6,6 +6,23 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 
+REPORT_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M UTC"
+TOP_STATION_LIMIT = 10
+TOP_ROUTE_LIMIT = 10
+TOP_USER_LIMIT = 15
+MAINTENANCE_TOP_LIMIT = 10
+OUTLIER_Z_THRESHOLD = 3.0
+OUTLIER_DISPLAY_LIMIT = 10
+WEEKDAY_ORDER = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+]
+
 
 class AnalyticsReporter:
     """Compute KPIs and format a plain-text report."""
@@ -41,7 +58,7 @@ class AnalyticsReporter:
         return metrics
 
     def build_report_text(self, metrics: Dict[str, object]) -> str:
-        timestamp = pd.Timestamp.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+        timestamp = pd.Timestamp.utcnow().strftime(REPORT_TIMESTAMP_FORMAT)
         lines: List[str] = [
             "CityBike Analytics Summary",
             "===========================",
@@ -85,7 +102,7 @@ class AnalyticsReporter:
         lines.append(self._format_table(metrics["monthly_trend"], columns=["year_month", "trip_count"]))
         lines.append("")
 
-        lines.append("Top 15 Users by Trip Count:")
+        lines.append(f"Top {TOP_USER_LIMIT} Users by Trip Count:")
         lines.append(self._format_table(metrics["top_users"], columns=["user_id", "trip_count"]))
         lines.append("")
 
@@ -114,8 +131,14 @@ class AnalyticsReporter:
         lines.append("")
 
         outliers = metrics.get("trip_outliers")
-        lines.append("Trip Outliers (top 10 by z-score):")
-        lines.append(self._format_table(outliers, columns=["trip_id", "duration_minutes", "distance_km", "max_abs_z"], max_rows=10))
+        lines.append(f"Trip Outliers (top {OUTLIER_DISPLAY_LIMIT} by z-score):")
+        lines.append(
+            self._format_table(
+                outliers,
+                columns=["trip_id", "duration_minutes", "distance_km", "max_abs_z"],
+                max_rows=OUTLIER_DISPLAY_LIMIT,
+            )
+        )
 
         return "\n".join(lines)
 
@@ -141,9 +164,13 @@ class AnalyticsReporter:
     def _trip_summary(self) -> Dict[str, float]:
         if self.trips.empty:
             return {"total_trips": 0, "total_distance_km": 0.0, "avg_duration_minutes": 0.0}
-        return {
-            "total_trips": int(len(self.trips)),
-            "total_distance_km": float(self.trips["distance_km"].sum()),
+        return (
+            self.maintenance["bike_id"]
+            .value_counts()
+            .reset_index()
+            .rename(columns={"index": "bike_id", "bike_id": "maintenance_events"})
+            .head(MAINTENANCE_TOP_LIMIT)
+        )
             "avg_duration_minutes": float(self.trips["duration_minutes"].mean()),
         }
 
@@ -162,7 +189,7 @@ class AnalyticsReporter:
                 .value_counts()
                 .reset_index(name="trip_count")
                 .rename(columns={column: "station_id"})
-                .head(10)
+                .head(TOP_STATION_LIMIT)
             )
             if lookup is not None:
                 counts["station_name"] = counts["station_id"].map(lookup)
@@ -184,8 +211,7 @@ class AnalyticsReporter:
         if self.trips.empty or "start_time" not in self.trips:
             return pd.DataFrame(columns=["weekday", "trip_count"])
         weekdays = self.trips["start_time"].dt.day_name()
-        ordered = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        counts = weekdays.value_counts().reindex(ordered, fill_value=0)
+        counts = weekdays.value_counts().reindex(WEEKDAY_ORDER, fill_value=0)
         counts = counts.reset_index().rename(columns={"index": "weekday"})
         counts = counts.rename(columns={counts.columns[1]: "trip_count"})
         return counts
@@ -227,7 +253,13 @@ class AnalyticsReporter:
     def _top_users(self) -> pd.DataFrame:
         if self.trips.empty or "user_id" not in self.trips:
             return pd.DataFrame(columns=["user_id", "trip_count"])
-        return self.trips["user_id"].value_counts().reset_index().head(15).rename(columns={"index": "user_id", "user_id": "trip_count"})
+        return (
+            self.trips["user_id"]
+            .value_counts()
+            .reset_index()
+            .head(TOP_USER_LIMIT)
+            .rename(columns={"index": "user_id", "user_id": "trip_count"})
+        )
 
     def _maintenance_cost(self) -> pd.DataFrame:
         if self.maintenance.empty or "bike_type" not in self.maintenance:
@@ -243,7 +275,7 @@ class AnalyticsReporter:
             .size()
             .reset_index(name="trip_count")
             .sort_values("trip_count", ascending=False)
-            .head(10)
+            .head(TOP_ROUTE_LIMIT)
         )
 
     def _completion_rate(self) -> Dict[str, float]:
@@ -282,6 +314,6 @@ class AnalyticsReporter:
             else:
                 df[f"{column}_z"] = (df[column] - df[column].mean()) / std
         df["max_abs_z"] = df[["duration_minutes_z", "distance_km_z"]].abs().max(axis=1)
-        return df[df["max_abs_z"] > 3].sort_values("max_abs_z", ascending=False)
+        return df[df["max_abs_z"] > OUTLIER_Z_THRESHOLD].sort_values("max_abs_z", ascending=False)
 
 

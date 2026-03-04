@@ -7,9 +7,9 @@ def dataframe_to_bikes(df, active=True):
     classic_factory = factories.ClassicBikeFactory()
     electric_factory = factories.ElectricBikeFactory()
     for _, row in df.iterrows():
-        if row["bike_type"] == "classic":
+        if row["bike_type"] == models.BIKE_TYPE_CLASSIC:
             bike = classic_factory.create_bike(row["bike_id"])
-        elif row["bike_type"] == "electric":
+        elif row["bike_type"] == models.BIKE_TYPE_ELECTRIC:
             bike = electric_factory.create_bike(row["bike_id"])
         else:
             continue
@@ -90,24 +90,24 @@ def dataframe_to_users(df):
     for _, row in df.iterrows():
         user_id = row["user_id"]
         if user_id not in users:
-            if row["user_type"] == "casual":
+            if row["user_type"] == models.USER_TYPE_CASUAL:
                 user = casual_factory.create_user(
                     id=user_id,
                     name=f"User {user_id}",
                     email=f"user{user_id}@example.com"
                 )
-            elif row["user_type"] == "member":
+            elif row["user_type"] == models.USER_TYPE_MEMBER:
                 user = member_factory.create_user(
                     id=user_id,
                     name=f"User {user_id}",
                     email=f"user{user_id}@example.com",
-                    tier=row.get("tier", "standard")
+                    tier=row.get("tier", models.MEMBER_TIER_BASIC)
                 )
             else:
                 continue
             users[user_id] = user
         else:
             user = users[user_id]
-            if row["user_type"] == "casual" and isinstance(user, models.CasualUser):
+            if row["user_type"] == models.USER_TYPE_CASUAL and isinstance(user, models.CasualUser):
                 user.day_pass_count += 1
     return list(users.values())

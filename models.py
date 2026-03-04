@@ -4,9 +4,19 @@ OOP classes (Entity, Bike, Station, ...)
 from abc import ABC, abstractmethod
 from datetime import datetime
 
+MEMBER_TIER_BASIC = "basic"
+MEMBER_TIER_PREMIUM = "premium"
+MEMBER_TIERS = (MEMBER_TIER_BASIC, MEMBER_TIER_PREMIUM)
+
+BIKE_TYPE_CLASSIC = "classic"
+BIKE_TYPE_ELECTRIC = "electric"
+BIKE_TYPES = (BIKE_TYPE_CLASSIC, BIKE_TYPE_ELECTRIC)
+
+USER_TYPE_CASUAL = "casual"
+USER_TYPE_MEMBER = "member"
+USER_TYPES = (USER_TYPE_CASUAL, USER_TYPE_MEMBER)
+
 BIKE_STATUSES = ("available", "in_use", "maintenance")
-MEMBER_TIERS = ("basic", "premium")
-BIKE_TYPES = ("classic", "electric")
 
 class Entity(ABC):
     """Base entity class"""
@@ -61,7 +71,7 @@ class Bike(Entity):
 class ClassicBike(Bike):
     """Classic bike model class"""
     def __init__(self, id, status, gear_count):
-        super().__init__(id, "classic", status)
+        super().__init__(id, BIKE_TYPE_CLASSIC, status)
         self.gear_count = gear_count
 
     @property
@@ -77,7 +87,7 @@ class ClassicBike(Bike):
 class ElectricBike(Bike):
     """Electric bike model class"""
     def __init__(self, id, status, battery_level, max_range_km):
-        super().__init__(id, "electric", status)
+        super().__init__(id, BIKE_TYPE_ELECTRIC, status)
         self.battery_level = battery_level
         self.max_range_km = max_range_km
 
@@ -196,14 +206,14 @@ class User(Entity):
 
     @type.setter
     def type(self, value):
-        if value not in ("casual", "member"):
-            raise ValueError("User type must be 'casual' or 'member'")
+        if value not in USER_TYPES:
+            raise ValueError(f"User type must be one of {USER_TYPES}")
         self._type = value
 
 class CasualUser(User):
     """Casual user model class"""
     def __init__(self, id, name, email, day_pass_count = 0):
-        super().__init__(id, name, email, "casual")
+        super().__init__(id, name, email, USER_TYPE_CASUAL)
         self.day_pass_count = day_pass_count
 
     @property
@@ -219,7 +229,7 @@ class CasualUser(User):
 class MemberUser(User):
     """Member user model class"""
     def __init__(self, id, name, email, membership_start_date, tier, membership_end_date=None):
-        super().__init__(id, name, email, "member")
+        super().__init__(id, name, email, USER_TYPE_MEMBER)
         self.membership_start_date = membership_start_date
         self.membership_end_date = membership_end_date
         self.tier = tier

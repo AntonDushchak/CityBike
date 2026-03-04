@@ -11,8 +11,6 @@ stations_clean_path = "data/stations_clean.csv"
 trips_clean_path = "data/trips_clean.csv"
 maintenance_clean_path = "data/maintenance_clean.csv"
 
-
-
 def main():
     stations_raw = load_csv(stations_path)
     trips_raw = load_csv(trips_path)

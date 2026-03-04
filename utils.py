@@ -5,6 +5,8 @@ Validation, formatting, helpers
 import pandas as pd
 from datetime import datetime
 
+from models import BIKE_TYPES, USER_TYPES
+
 def validate_data_trips(trip):
     """Return boolean mask for valid trip rows in DataFrame"""
     required = ["trip_id", "user_id", "user_type", "bike_id", "bike_type", "start_station_id", "end_station_id", "start_time", "end_time", "duration_minutes", "distance_km", "status"]
@@ -137,8 +139,7 @@ def clean_data_users(trips):
     
     users_df = users_df.dropna()
     
-    valid_types = ["casual", "member"]
-    users_df = users_df[users_df["user_type"].isin(valid_types)]
+    users_df = users_df[users_df["user_type"].isin(USER_TYPES)]
     
     return users_df.reset_index(drop=True)
 
@@ -163,7 +164,6 @@ def clean_data_bikes(trips, maintenance):
     
     bikes_df = bikes_df.dropna()
     
-    valid_types = ["classic", "electric"]
-    bikes_df = bikes_df[bikes_df["bike_type"].isin(valid_types)]
+    bikes_df = bikes_df[bikes_df["bike_type"].isin(BIKE_TYPES)]
     
     return bikes_df.reset_index(drop=True)
