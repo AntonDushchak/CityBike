@@ -25,7 +25,6 @@ WEEKDAY_ORDER = [
     "Sunday",
 ]
 
-
 class AnalyticsReporter:
     """Compute KPIs and format a plain-text report."""
 
@@ -319,5 +318,3 @@ class AnalyticsReporter:
                 df[f"{column}_z"] = (df[column] - df[column].mean()) / std
         df["max_abs_z"] = df[["duration_minutes_z", "distance_km_z"]].abs().max(axis=1)
         return df[df["max_abs_z"] > OUTLIER_Z_THRESHOLD].sort_values("max_abs_z", ascending=False)
-
-

@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Union
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-
 def calculate_statistics(data: ArrayLike) -> Dict[str, float]:
     """Calculate statistical metrics for a dataset.
 
@@ -27,7 +26,6 @@ def calculate_statistics(data: ArrayLike) -> Dict[str, float]:
         "max": data.max(),
         "count": data.size
     }
-
 
 def compute_distance_matrix(
     positions1: ArrayLike, positions2: ArrayLike
@@ -52,7 +50,6 @@ def compute_distance_matrix(
     dist = np.sqrt(dlat ** 2 + dlon ** 2)
     return dist
 
-
 def normalize_data(
     data: ArrayLike, axis: int = -1, order: int = 2
 ) -> NDArray[np.floating[Any]]:
@@ -69,7 +66,6 @@ def normalize_data(
     l2 = np.atleast_1d(np.linalg.norm(data, order, axis))
     l2[l2 == 0] = 1
     return data / np.expand_dims(l2, axis)
-
 
 def batch_calculate_fares(
     distances_km: ArrayLike,
@@ -93,7 +89,6 @@ def batch_calculate_fares(
     fares = base_rate + (distances * per_km_rate)
     return np.maximum(fares, min_fare)
 
-
 def batch_calculate_fares_with_strategy(
     distances_km: ArrayLike, strategy_rates: ArrayLike, min_fare: float = 2.0
 ) -> NDArray[np.floating[Any]]:
@@ -112,7 +107,6 @@ def batch_calculate_fares_with_strategy(
     rates = np.asarray(strategy_rates)
     fares = distances * rates
     return np.maximum(fares, min_fare)
-
 
 def detect_outliers_zscore(
     data: ArrayLike, threshold: float = 3.0
@@ -153,7 +147,6 @@ def detect_outliers_zscore(
         "mean": mean,
         "std": std
     }
-
 
 def remove_outliers_zscore(
     data: ArrayLike, threshold: float = 3.0

@@ -6,7 +6,6 @@ from typing import Union
 
 import pandas as pd
 
-
 def load_csv(path: Union[str, Path]) -> pd.DataFrame:
     """Load a CSV file into a pandas DataFrame.
 
@@ -28,13 +27,11 @@ def load_csv(path: Union[str, Path]) -> pd.DataFrame:
         raise RuntimeError(f"Error loading {path}: {e}") from e
     return df
 
-
 def _ensure_parent(path: Union[str, Path]) -> Path:
     """Create parent directories if they do not exist and return Path object."""
     target = Path(path)
     target.parent.mkdir(parents=True, exist_ok=True)
     return target
-
 
 def save_csv(path: Union[str, Path], df: pd.DataFrame) -> None:
     """Save a DataFrame to a CSV file.
@@ -51,7 +48,6 @@ def save_csv(path: Union[str, Path], df: pd.DataFrame) -> None:
         df.to_csv(target, index=False)
     except Exception as e:
         raise RuntimeError(f"Error saving {target}: {e}") from e
-
 
 def save_txt(path: Union[str, Path], contents: str, encoding: str = "utf-8") -> None:
     """Save text content to a file.

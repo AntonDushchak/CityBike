@@ -18,7 +18,6 @@ USER_TYPES: Tuple[str, str] = (USER_TYPE_CASUAL, USER_TYPE_MEMBER)
 
 BIKE_STATUSES: Tuple[str, str, str] = ("available", "in_use", "maintenance")
 
-
 class Entity(ABC):
     """Abstract base class for all domain entities.
 
@@ -55,7 +54,6 @@ class Entity(ABC):
     def __repr__(self) -> str:
         """Return a debug string representation."""
         return self.__str__()
-
 
 class Bike(Entity):
     """Bike model representing a single bike in the fleet.
@@ -107,7 +105,6 @@ class Bike(Entity):
     def __repr__(self) -> str:
         return f"Bike(id={self.id!r}, type={self.type!r}, status={self.status!r})"
 
-
 class ClassicBike(Bike):
     """Classic bike with gear system.
 
@@ -143,7 +140,6 @@ class ClassicBike(Bike):
 
     def __repr__(self) -> str:
         return f"ClassicBike(id={self.id!r}, status={self.status!r}, gear_count={self.gear_count!r})"
-
 
 class ElectricBike(Bike):
     """Electric bike with battery.
@@ -195,7 +191,6 @@ class ElectricBike(Bike):
 
     def __repr__(self) -> str:
         return f"ElectricBike(id={self.id!r}, status={self.status!r}, battery_level={self.battery_level!r}, max_range_km={self.max_range_km!r})"
-
 
 class Station(Entity):
     """Docking station for bikes.
@@ -267,7 +262,6 @@ class Station(Entity):
         lat, lon = self.location
         return f"Station(id={self.id!r}, name={self.name!r}, capacity={self.capacity!r}, latitude={lat!r}, longitude={lon!r})"
 
-
 class Trip(Entity):
     """Trip record representing a single bike rental.
 
@@ -335,7 +329,6 @@ class Trip(Entity):
             f"start_time={self.start_time!r}, end_time={self.end_time!r}, distance_km={self.distance_km!r})"
         )
 
-
 class User(Entity):
     """Base user class for bike-share customers.
 
@@ -401,7 +394,6 @@ class User(Entity):
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, name={self.name!r}, email={self.email!r}, type={self.type!r})"
 
-
 class CasualUser(User):
     """Casual user with pay-per-ride access.
 
@@ -438,7 +430,6 @@ class CasualUser(User):
 
     def __repr__(self) -> str:
         return f"CasualUser(id={self.id!r}, name={self.name!r}, email={self.email!r}, day_pass_count={self.day_pass_count!r})"
-
 
 class MemberUser(User):
     """Member user with subscription access.
@@ -493,7 +484,6 @@ class MemberUser(User):
             f"MemberUser(id={self.id!r}, name={self.name!r}, email={self.email!r}, "
             f"tier={self.tier!r}, start={self.membership_start_date!r}, end={self.membership_end_date!r})"
         )
-
 
 class MaintenanceRecord:
     """Maintenance event for a bike.

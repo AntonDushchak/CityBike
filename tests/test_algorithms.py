@@ -4,7 +4,6 @@ import pytest
 
 from algorithms import my_search, my_sort, pandas_search, python_sort
 
-
 class TestMergeSort:
     """Tests for custom merge sort implementation."""
 
@@ -98,7 +97,30 @@ class TestMergeSort:
         assert result[1]["duration_minutes"] == 30
         assert result[2]["duration_minutes"] == 45
 
+class TestPythonSort:
+    """Tests for Python built-in sort wrapper."""
 
+    def test_python_sort_integers(self) -> None:
+        """Test Python sort with integers."""
+        data = [5, 2, 8, 1, 9]
+        result = python_sort(data, key=lambda x: x)
+        assert result == [1, 2, 5, 8, 9]
+
+    def test_python_sort_preserves_original(self) -> None:
+        """Test that Python sort does not modify original list."""
+        data = [3, 1, 4, 1, 5]
+        original = data.copy()
+        python_sort(data, key=lambda x: x)
+        assert data == original
+
+    def test_python_sort_with_custom_key(self) -> None:
+        """Test Python sort with custom key function."""
+        data = [{"x": 3}, {"x": 1}, {"x": 2}]
+        result = python_sort(data, key=lambda d: d["x"])
+        assert result[0]["x"] == 1
+        assert result[1]["x"] == 2
+        assert result[2]["x"] == 3
+        
 class TestBinarySearch:
     """Tests for custom binary search implementation."""
 
@@ -163,7 +185,6 @@ class TestBinarySearch:
         result = my_search(trips, target, key=lambda x: x["trip_id"])
         assert result == 1
 
-
 class TestPandasSearch:
     """Tests for pandas-based search implementation."""
 
@@ -187,28 +208,3 @@ class TestPandasSearch:
         target = {"id": "X", "value": 99}
         result = pandas_search(data, target, key=lambda x: x["id"])
         assert result == -1
-
-
-class TestPythonSort:
-    """Tests for Python built-in sort wrapper."""
-
-    def test_python_sort_integers(self) -> None:
-        """Test Python sort with integers."""
-        data = [5, 2, 8, 1, 9]
-        result = python_sort(data, key=lambda x: x)
-        assert result == [1, 2, 5, 8, 9]
-
-    def test_python_sort_preserves_original(self) -> None:
-        """Test that Python sort does not modify original list."""
-        data = [3, 1, 4, 1, 5]
-        original = data.copy()
-        python_sort(data, key=lambda x: x)
-        assert data == original
-
-    def test_python_sort_with_custom_key(self) -> None:
-        """Test Python sort with custom key function."""
-        data = [{"x": 3}, {"x": 1}, {"x": 2}]
-        result = python_sort(data, key=lambda d: d["x"])
-        assert result[0]["x"] == 1
-        assert result[1]["x"] == 2
-        assert result[2]["x"] == 3

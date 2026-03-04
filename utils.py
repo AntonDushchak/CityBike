@@ -7,7 +7,6 @@ import pandas as pd
 
 from models import BIKE_TYPES, USER_TYPES
 
-
 def validate_data_trips(trip: pd.DataFrame) -> pd.Series:
     """Return boolean mask for valid trip rows in DataFrame.
 
@@ -28,7 +27,6 @@ def validate_data_trips(trip: pd.DataFrame) -> pd.Series:
     mask &= trip["end_time"] >= trip["start_time"]
     return mask
 
-
 def validate_data_stations(station: pd.DataFrame) -> pd.Series:
     """Return boolean mask for valid station rows in DataFrame.
 
@@ -44,7 +42,6 @@ def validate_data_stations(station: pd.DataFrame) -> pd.Series:
     mask &= station["latitude"].apply(lambda x: isinstance(x, (int, float)) and -90 <= x <= 90)
     mask &= station["longitude"].apply(lambda x: isinstance(x, (int, float)) and -180 <= x <= 180)
     return mask
-
 
 def validate_data_maintenance(maintenance: pd.DataFrame) -> pd.Series:
     """Return boolean mask for valid maintenance rows in DataFrame.
@@ -62,7 +59,6 @@ def validate_data_maintenance(maintenance: pd.DataFrame) -> pd.Series:
     mask = maintenance[required].notnull().all(axis=1)
     mask &= maintenance["cost"].apply(lambda x: isinstance(x, (int, float)) and x >= 0)
     return mask
-
 
 def clean_data_trips(trips: pd.DataFrame) -> pd.DataFrame:
     """Clean and standardize trip data in DataFrame.
@@ -91,7 +87,6 @@ def clean_data_trips(trips: pd.DataFrame) -> pd.DataFrame:
     df = df[mask]
     return df
 
-
 def clean_data_stations(stations: pd.DataFrame) -> pd.DataFrame:
     """Clean and standardize station data in DataFrame.
 
@@ -114,7 +109,6 @@ def clean_data_stations(stations: pd.DataFrame) -> pd.DataFrame:
     mask = validate_data_stations(df)
     df = df[mask]
     return df
-
 
 def clean_data_maintenance(maintenance: pd.DataFrame) -> pd.DataFrame:
     """Clean and standardize maintenance data in DataFrame.
@@ -139,67 +133,6 @@ def clean_data_maintenance(maintenance: pd.DataFrame) -> pd.DataFrame:
     df = df[mask]
     return df
 
-
-def format_duration(seconds: Union[int, float]) -> Optional[str]:
-    """Format duration in human-readable format (e.g., 1h 2m 3s).
-
-    Args:
-        seconds: Duration in seconds.
-
-    Returns:
-        Formatted string or None if invalid.
-    """
-    try:
-        if not isinstance(seconds, (int, float)) or seconds < 0:
-            return None
-        seconds = int(seconds)
-        h = seconds // 3600
-        m = (seconds % 3600) // 60
-        s = seconds % 60
-        parts = []
-        if h > 0:
-            parts.append(f"{h}h")
-        if m > 0:
-            parts.append(f"{m}m")
-        if s > 0 or not parts:
-            parts.append(f"{s}s")
-        return " ".join(parts)
-    except Exception:
-        return None
-
-
-def format_date(timestamp: Union[str, int, float, datetime, None]) -> Optional[datetime]:
-    """Parse various timestamp formats into a datetime object.
-
-    Args:
-        timestamp: Input timestamp (string, number, or datetime).
-
-    Returns:
-        Parsed datetime or None if invalid.
-    """
-    try:
-        if timestamp is None:
-            return None
-        if isinstance(timestamp, datetime):
-            return timestamp
-        if isinstance(timestamp, str):
-            try:
-                return datetime.fromisoformat(timestamp)
-            except Exception:
-                pass
-            try:
-                return datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
-            except Exception:
-                return None
-        if isinstance(timestamp, (int, float)):
-            if timestamp < 0:
-                return None
-            return datetime.fromtimestamp(timestamp)
-    except Exception:
-        return None
-    return None
-
-
 def clean_data_users(trips: pd.DataFrame) -> pd.DataFrame:
     """Create cleaned users DataFrame from trips data.
 
@@ -221,7 +154,6 @@ def clean_data_users(trips: pd.DataFrame) -> pd.DataFrame:
     users_df = users_df[users_df["user_type"].isin(USER_TYPES)]
     
     return users_df.reset_index(drop=True)
-
 
 def clean_data_bikes(trips: pd.DataFrame, maintenance: pd.DataFrame) -> pd.DataFrame:
     """Create cleaned bikes DataFrame from trips and maintenance data.
@@ -255,3 +187,61 @@ def clean_data_bikes(trips: pd.DataFrame, maintenance: pd.DataFrame) -> pd.DataF
     bikes_df = bikes_df[bikes_df["bike_type"].isin(BIKE_TYPES)]
     
     return bikes_df.reset_index(drop=True)
+
+def format_duration(seconds: Union[int, float]) -> Optional[str]:
+    """Format duration in human-readable format (e.g., 1h 2m 3s).
+
+    Args:
+        seconds: Duration in seconds.
+
+    Returns:
+        Formatted string or None if invalid.
+    """
+    try:
+        if not isinstance(seconds, (int, float)) or seconds < 0:
+            return None
+        seconds = int(seconds)
+        h = seconds // 3600
+        m = (seconds % 3600) // 60
+        s = seconds % 60
+        parts = []
+        if h > 0:
+            parts.append(f"{h}h")
+        if m > 0:
+            parts.append(f"{m}m")
+        if s > 0 or not parts:
+            parts.append(f"{s}s")
+        return " ".join(parts)
+    except Exception:
+        return None
+
+def format_date(timestamp: Union[str, int, float, datetime, None]) -> Optional[datetime]:
+    """Parse various timestamp formats into a datetime object.
+
+    Args:
+        timestamp: Input timestamp (string, number, or datetime).
+
+    Returns:
+        Parsed datetime or None if invalid.
+    """
+    try:
+        if timestamp is None:
+            return None
+        if isinstance(timestamp, datetime):
+            return timestamp
+        if isinstance(timestamp, str):
+            try:
+                return datetime.fromisoformat(timestamp)
+            except Exception:
+                pass
+            try:
+                return datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+            except Exception:
+                return None
+        if isinstance(timestamp, (int, float)):
+            if timestamp < 0:
+                return None
+            return datetime.fromtimestamp(timestamp)
+    except Exception:
+        return None
+    return None

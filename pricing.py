@@ -2,7 +2,6 @@
 
 from abc import ABC, abstractmethod
 
-
 class PricingStrategy(ABC):
     """Abstract base class for pricing strategies."""
 
@@ -18,7 +17,6 @@ class PricingStrategy(ABC):
         """
         pass
 
-
 class CasualPricing(PricingStrategy):
     """Standard pricing strategy for casual users."""
 
@@ -33,7 +31,6 @@ class CasualPricing(PricingStrategy):
         """
         return 1.0 * distance_km
 
-
 class MemberPricing(PricingStrategy):
     """Discounted pricing strategy for member users."""
 
@@ -47,7 +44,6 @@ class MemberPricing(PricingStrategy):
             Calculated price.
         """
         return 0.8 * distance_km
-
 
 class PeakHourPricing(PricingStrategy):
     """Surge pricing strategy for peak hours."""
